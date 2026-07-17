@@ -1,0 +1,52 @@
+.reservas-page{
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.reservas-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reservas-header h1{
+    margin-bottom: 6px;
+}
+
+.reservas-header p{
+    color: #6b7280;
+}
+
+.reservas-toolbar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-input{
+    width: 320px;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    outline: none;
+    font-size: 15px;
+}
+
+.search-input:focus{
+    border-color: #3366FF;
+}
+
+.btn-primary{
+    background: #3366FF;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-primary:hover{
+    background: #2952cc;
+}

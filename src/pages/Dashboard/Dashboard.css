@@ -1,0 +1,113 @@
+.dashboard{
+    display:flex;
+    flex-direction:column;
+    gap:30px;
+}
+
+.dashboard-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.dashboard-header h1{
+    font-size:32px;
+    margin-bottom:8px;
+}
+
+.dashboard-header p{
+    color:#6B7280;
+}
+
+.date-btn{
+    background:#3366FF;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:10px;
+    font-weight:600;
+}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+}
+
+.card{
+    background:white;
+    border-radius:16px;
+    padding:25px;
+    box-shadow:0 8px 20px rgba(0,0,0,.05);
+}
+
+.card h3{
+    color:#64748B;
+    font-size:16px;
+    margin-bottom:15px;
+}
+
+.card span{
+    font-size:38px;
+    font-weight:bold;
+    color:#3366FF;
+}
+
+.dashboard-body{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:20px;
+}
+
+.reservas,
+.agenda{
+
+    background:white;
+
+    border-radius:16px;
+
+    padding:25px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.05);
+
+}
+
+.placeholder{
+
+    margin-top:20px;
+
+    border:2px dashed #D1D5DB;
+
+    border-radius:12px;
+
+    height:260px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    color:#94A3B8;
+
+}
+
+.dashboard-role{
+
+    display:inline-block;
+
+    margin:10px 0;
+
+    background:#EAF1FF;
+
+    color:#3366FF;
+
+    padding:6px 15px;
+
+    border-radius:30px;
+
+    font-size:14px;
+
+    font-weight:600;
+
+}

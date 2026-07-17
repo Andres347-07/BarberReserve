@@ -1,0 +1,20 @@
+.reservas-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.reservas-table th{
+    text-align:left;
+    background:#4f6df5;
+    color:white;
+    padding:14px;
+}
+
+.reservas-table td{
+    padding:14px;
+    border-bottom:1px solid #eee;
+}
+
+.reservas-table tr:hover{
+    background:#f7f8fc;
+}

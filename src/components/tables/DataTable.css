@@ -1,0 +1,78 @@
+.tabla-container{
+    background:white;
+    border-radius:15px;
+    overflow:hidden;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    table-layout:fixed;
+}
+
+th{
+    background:#3366FF;
+    color:white;
+    text-align:left;
+    padding:15px;
+    vertical-align:middle;
+}
+
+td{
+    padding:15px;
+    border-bottom:1px solid #eee;
+    vertical-align:middle;
+}
+
+tr:hover{
+    background:#f7f8fc;
+}
+
+.acciones{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+}
+
+.btn-edit{
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.btn-delete{
+    background:#dc2626;
+    color:white;
+    border:none;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.btn-edit:hover{
+    background:#1d4ed8;
+}
+
+.btn-delete:hover{
+    background:#b91c1c;
+}
+
+
+/* Columna Acciones */
+
+th:last-child,
+td:last-child{
+    width:130px;
+    text-align:center;
+}
+
+.acciones{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+}

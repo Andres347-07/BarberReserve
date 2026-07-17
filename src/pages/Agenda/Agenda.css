@@ -1,0 +1,270 @@
+.agenda-page{
+    display:flex;
+    flex-direction:column;
+    gap:30px;
+}
+
+.agenda-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.agenda-header h1{
+    margin-bottom:8px;
+    font-size:2rem;
+    color:#1f2937;
+}
+
+.agenda-header p{
+    color:#6b7280;
+    font-size:1rem;
+}
+
+.agenda-container{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:30px;
+    align-items:start;
+}
+
+/* ===========================
+   Agenda del día
+=========================== */
+
+.agenda-list{
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+}
+
+.agenda-list h2,
+.proximas-citas h2{
+    margin-bottom:5px;
+    color:#1f2937;
+    font-size:1.35rem;
+}
+
+.agenda-card{
+
+    background:#ffffff;
+
+    border-left:6px solid #3366FF;
+
+    border-radius:16px;
+
+    padding:22px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.07);
+
+    transition:.25s;
+
+}
+
+.agenda-card:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:0 12px 28px rgba(0,0,0,.12);
+
+}
+
+.hora-badge{
+
+    display:inline-block;
+
+    background:#EEF4FF;
+
+    color:#3366FF;
+
+    font-weight:700;
+
+    padding:8px 16px;
+
+    border-radius:10px;
+
+    margin-bottom:18px;
+
+    font-size:.95rem;
+
+}
+
+.agenda-info{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:16px;
+
+}
+
+.info-item{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.info-label{
+
+    color:#9ca3af;
+
+    font-size:.82rem;
+
+    font-weight:600;
+
+    text-transform:uppercase;
+
+    margin-bottom:4px;
+
+    letter-spacing:.5px;
+
+}
+
+.info-value{
+
+    color:#1f2937;
+
+    font-size:1rem;
+
+    font-weight:600;
+
+}
+
+/* ===========================
+   Próximas citas
+=========================== */
+
+.proximas-citas{
+
+    background:#ffffff;
+
+    border-radius:16px;
+
+    padding:25px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.07);
+
+}
+
+.proximas-citas h2{
+
+    margin-bottom:20px;
+
+}
+
+.proxima-cita{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    background:#f8fafc;
+
+    border-radius:12px;
+
+    padding:15px;
+
+    margin-bottom:15px;
+
+    transition:.2s;
+
+}
+
+.proxima-cita:last-child{
+
+    margin-bottom:0;
+
+}
+
+.proxima-cita:hover{
+
+    background:#EEF4FF;
+
+}
+
+.proxima-hora{
+
+    min-width:75px;
+
+    text-align:center;
+
+    background:#3366FF;
+
+    color:#fff;
+
+    padding:8px 10px;
+
+    border-radius:10px;
+
+    font-weight:700;
+
+    font-size:.9rem;
+
+}
+
+.proxima-info{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.proxima-info strong{
+
+    color:#1f2937;
+
+    margin-bottom:4px;
+
+}
+
+.proxima-info span{
+
+    color:#6b7280;
+
+    font-size:.9rem;
+
+}
+
+/* ===========================
+   Responsive
+=========================== */
+
+@media (max-width:900px){
+
+    .agenda-container{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+@media (max-width:600px){
+
+    .agenda-card{
+
+        padding:18px;
+
+    }
+
+    .proxima-cita{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+    }
+
+    .proxima-hora{
+
+        min-width:auto;
+
+    }
+
+}
