@@ -1,20 +1,54 @@
 .reservas-table{
+
     width:100%;
     border-collapse:collapse;
+
 }
 
 .reservas-table th{
-    text-align:left;
-    background:#4f6df5;
+
+    background:#3366FF;
     color:white;
-    padding:14px;
+    text-align:left;
+    padding:15px;
+
 }
 
 .reservas-table td{
-    padding:14px;
-    border-bottom:1px solid #eee;
+
+    padding:15px;
+    border-bottom:1px solid #EEEEEE;
+    color:#4B5563;
+
 }
 
-.reservas-table tr:hover{
-    background:#f7f8fc;
+.reservas-table tbody tr{
+
+    transition:background .2s ease;
+
+}
+
+.reservas-table tbody tr:hover{
+
+    background:#F8FAFC;
+
+}
+
+.reservas-table td:last-child{
+
+    font-weight:600;
+
+}
+
+/* Responsive */
+
+@media (max-width:768px){
+
+    .reservas-table{
+
+        display:block;
+        overflow-x:auto;
+
+    }
+
 }

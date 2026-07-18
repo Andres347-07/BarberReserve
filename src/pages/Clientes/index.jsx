@@ -1,9 +1,19 @@
+import { useState } from "react";
+
 import "./Clientes.css";
 
 import clientes from "../../mocks/clientes";
+
 import DataTable from "../../components/tables/DataTable";
+import ClienteForm from "../../components/forms/ClienteForm";
 
 export default function Clientes() {
+
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+
+  const [listaClientes, setListaClientes] = useState(clientes);
+
+  const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
 
   const columnas = [
     { key: "nombre", label: "Nombre" },
@@ -13,43 +23,110 @@ export default function Clientes() {
     { key: "totalVisitas", label: "Visitas" },
   ];
 
+  const guardarCliente = (datosCliente) => {
+
+    if (clienteSeleccionado) {
+
+      setListaClientes((clientesActuales) =>
+        clientesActuales.map((cliente) =>
+          cliente.id === clienteSeleccionado.id
+            ? {
+                ...cliente,
+                nombre: datosCliente.nombre,
+                telefono: datosCliente.telefono,
+                correo: datosCliente.correo,
+              }
+            : cliente
+        )
+      );
+
+    } else {
+
+      const nuevoCliente = {
+        id: listaClientes.length + 1,
+        ...datosCliente,
+        ultimaCita: "Sin citas",
+        totalVisitas: 0,
+      };
+
+      setListaClientes((clientesActuales) => [
+        ...clientesActuales,
+        nuevoCliente,
+      ]);
+
+    }
+
+    setClienteSeleccionado(null);
+    setMostrarFormulario(false);
+
+  };
+
   return (
 
     <div className="clientes">
 
-      <div className="clientes-header">
+      {!mostrarFormulario ? (
 
-        <div>
+        <>
 
-          <h1>Clientes</h1>
+          <div className="clientes-header">
 
-          <p>
-            Administra los clientes registrados en la barbería.
-          </p>
+            <div>
 
-        </div>
+              <h1>Clientes</h1>
 
-        <button className="btn-primary">
-          + Nuevo Cliente
-        </button>
+              <p>
+                Administra los clientes registrados en la barbería.
+              </p>
 
-      </div>
+            </div>
 
-      <div className="clientes-toolbar">
+            <button
+              className="btn-primary"
+              onClick={() => {
 
-        <input
-          type="text"
-          placeholder="Buscar cliente..."
-          className="search-input"
+                setClienteSeleccionado(null);
+                setMostrarFormulario(true);
+
+              }}
+            >
+              + Nuevo Cliente
+            </button>
+
+          </div>
+
+          <div className="clientes-toolbar">
+
+            <input
+              type="text"
+              placeholder="Buscar cliente..."
+              className="search-input"
+            />
+
+          </div>
+
+          <DataTable
+            columns={columnas}
+            data={listaClientes}
+            showActions={true}
+          />
+
+        </>
+
+      ) : (
+
+        <ClienteForm
+          cliente={clienteSeleccionado}
+          onCancel={() => {
+
+            setClienteSeleccionado(null);
+            setMostrarFormulario(false);
+
+          }}
+          onSave={guardarCliente}
         />
 
-      </div>
-
-      <DataTable
-        columns={columnas}
-        data={clientes}
-        showActions={true}
-      />
+      )}
 
     </div>
 
