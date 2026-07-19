@@ -1,0 +1,118 @@
+Listado de rutas de carpetas para el volumen Data
+El número de serie del volumen es 000001CD BE42:592E
+D:\DIPLOMADO\BARBERRESERVE\SRC
+¦   App.jsx
+¦   main.jsx
+¦   
++---assets
+¦   +---icons
+¦   +---images
+¦   ¦       barber-login.png
+¦   ¦       
+¦   +---logo
+¦           logo.png
+¦           
++---components
+¦   +---cards
+¦   ¦       DashboardCard.css
+¦   ¦       DashboardCard.jsx
+¦   ¦       
+¦   +---common
+¦   +---dashboard
+¦   ¦       AgendaCard.css
+¦   ¦       AgendaCard.jsx
+¦   ¦       
+¦   +---forms
+¦   ¦   +---BarberoForm
+¦   ¦   +---ClienteForm
+¦   ¦   ¦       ClienteForm.css
+¦   ¦   ¦       index.jsx
+¦   ¦   ¦       
+¦   ¦   +---HorarioForm
+¦   ¦   +---ReservaForm
+¦   ¦   +---ServicioForm
+¦   +---layout
+¦   ¦       Footer.jsx
+¦   ¦       Navbar.jsx
+¦   ¦       Sidebar.css
+¦   ¦       Sidebar.jsx
+¦   ¦       
+¦   +---tables
+¦   ¦       DataTable.css
+¦   ¦       DataTable.jsx
+¦   ¦       ReservasTable.css
+¦   ¦       ReservasTable.jsx
+¦   ¦       
+¦   +---ui
++---constants
++---layouts
+¦       AdminLayout.css
+¦       AdminLayout.jsx
+¦       MainLayout.css
+¦       MainLayout.jsx
+¦       
++---mocks
+¦       agenda.js
+¦       barberos.js
+¦       clientes.js
+¦       dashboard.js
+¦       horarios.js
+¦       reservas.js
+¦       servicios.js
+¦       usuario.js
+¦       
++---pages
+¦   +---Agenda
+¦   ¦       Agenda.css
+¦   ¦       index.jsx
+¦   ¦       
+¦   +---AgendaBarbero
+¦   +---Barberos
+¦   ¦       Barberos.css
+¦   ¦       index.jsx
+¦   ¦       
+¦   +---Clientes
+¦   ¦       Clientes.css
+¦   ¦       index.jsx
+¦   ¦       
+¦   +---Dashboard
+¦   ¦       Dashboard.css
+¦   ¦       index.jsx
+¦   ¦       
+¦   +---DashboardBarbero
+¦   +---Horarios
+¦   ¦       Horarios.css
+¦   ¦       index.jsx
+¦   ¦       
+¦   +---Login
+¦   ¦       index.jsx
+¦   ¦       Login.css
+¦   ¦       
+¦   +---PerfilBarbero
+¦   +---Reservas
+¦   ¦       index.jsx
+¦   ¦       Reservas.css
+¦   ¦       
+¦   +---Servicios
+¦           index.jsx
+¦           Servicios.css
+¦           
++---routes
+¦       AppRouter.jsx
+¦       
++---services
+¦       dashboardService.js
+¦       
++---styles
+¦       agenda.css
+¦       barberos.css
+¦       clientes.css
+¦       dashboard.css
+¦       global.css
+¦       horarios.css
+¦       layout.css
+¦       login.css
+¦       reservas.css
+¦       servicios.css
+¦       
++---utils
