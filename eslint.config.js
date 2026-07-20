@@ -29,6 +29,14 @@ export default defineConfig([
         },
       },
     },
+
+    rules: {
+
+      // Esta regla genera falsos positivos cuando consumimos APIs
+      "react-hooks/set-state-in-effect": "off",
+
+    },
+
   },
 
   // BACKEND (Node.js)

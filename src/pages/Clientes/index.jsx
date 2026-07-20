@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import "./Clientes.css";
 
-import clientes from "../../mocks/clientes";
+import clienteService from "../../services/clienteService";
 
 import DataTable from "../../components/tables/DataTable";
 import ClienteForm from "../../components/forms/ClienteForm";
@@ -10,11 +10,36 @@ import ClienteForm from "../../components/forms/ClienteForm";
 export default function Clientes() {
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
-
-  const [listaClientes, setListaClientes] = useState(clientes);
-
+  const [listaClientes, setListaClientes] = useState([]);
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
 
+  // ===============================
+  // Obtener clientes
+  // ===============================
+  const cargarClientes = async () => {
+
+    try {
+
+      const clientes = await clienteService.obtenerClientes();
+      setListaClientes(clientes);
+
+    } catch (error) {
+
+      console.error("Error al obtener clientes:", error);
+
+    }
+
+  };
+
+  useEffect(() => {
+
+    cargarClientes();
+
+  }, []);
+
+  // ===============================
+  // Columnas de la tabla
+  // ===============================
   const columnas = [
     { key: "nombre", label: "Nombre" },
     { key: "telefono", label: "Teléfono" },
@@ -23,41 +48,71 @@ export default function Clientes() {
     { key: "totalVisitas", label: "Visitas" },
   ];
 
-  const guardarCliente = (datosCliente) => {
+  // ===============================
+  // Crear o actualizar
+  // ===============================
+  const guardarCliente = async (datosCliente) => {
 
-    if (clienteSeleccionado) {
+    try {
 
-      setListaClientes((clientesActuales) =>
-        clientesActuales.map((cliente) =>
-          cliente.id === clienteSeleccionado.id
-            ? {
-                ...cliente,
-                nombre: datosCliente.nombre,
-                telefono: datosCliente.telefono,
-                correo: datosCliente.correo,
-              }
-            : cliente
-        )
-      );
+      if (clienteSeleccionado) {
 
-    } else {
+        await clienteService.actualizarCliente(
+          clienteSeleccionado.id,
+          datosCliente
+        );
 
-      const nuevoCliente = {
-        id: listaClientes.length + 1,
-        ...datosCliente,
-        ultimaCita: "Sin citas",
-        totalVisitas: 0,
-      };
+      } else {
 
-      setListaClientes((clientesActuales) => [
-        ...clientesActuales,
-        nuevoCliente,
-      ]);
+        await clienteService.crearCliente(datosCliente);
+
+      }
+
+      await cargarClientes();
+
+      setClienteSeleccionado(null);
+      setMostrarFormulario(false);
+
+    } catch (error) {
+
+      console.error("Error al guardar cliente:", error);
 
     }
 
-    setClienteSeleccionado(null);
-    setMostrarFormulario(false);
+  };
+
+  // ===============================
+  // Editar
+  // ===============================
+  const editarCliente = (cliente) => {
+
+    setClienteSeleccionado(cliente);
+    setMostrarFormulario(true);
+
+  };
+
+  // ===============================
+  // Eliminar
+  // ===============================
+  const eliminarCliente = async (id) => {
+
+    const confirmar = window.confirm(
+      "¿Desea eliminar este cliente?"
+    );
+
+    if (!confirmar) return;
+
+    try {
+
+      await clienteService.eliminarCliente(id);
+
+      await cargarClientes();
+
+    } catch (error) {
+
+      console.error("Error al eliminar cliente:", error);
+
+    }
 
   };
 
@@ -109,6 +164,8 @@ export default function Clientes() {
             columns={columnas}
             data={listaClientes}
             showActions={true}
+            onEdit={editarCliente}
+            onDelete={eliminarCliente}
           />
 
         </>

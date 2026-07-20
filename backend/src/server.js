@@ -3,10 +3,8 @@ require("dotenv").config();
 const app = require("./app");
 const sequelize = require("./database/connection");
 
-// Registrar modelos
-require("./models/Cliente");
-require("./models/Barbero");
-require("./models/Servicio");
+// Registrar modelos y relaciones
+require("./models");
 
 const PORT = process.env.PORT || 4000;
 

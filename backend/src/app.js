@@ -4,6 +4,8 @@ const cors = require("cors");
 const clienteRoutes = require("./routes/cliente.routes");
 const barberoRoutes = require("./routes/barbero.routes");
 const servicioRoutes = require("./routes/servicio.routes");
+const horarioRoutes = require("./routes/horario.routes");
+const reservaRoutes = require("./routes/reserva.routes");
 
 const app = express();
 
@@ -16,6 +18,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/clientes", clienteRoutes);
 app.use("/api/barberos", barberoRoutes);
 app.use("/api/servicios", servicioRoutes);
+app.use("/api/horarios", horarioRoutes);
+app.use("/api/reservas", reservaRoutes);
 
 // Ruta de prueba
 app.get("/", (req, res) => {
