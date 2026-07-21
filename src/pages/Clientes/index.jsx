@@ -13,6 +13,7 @@ export default function Clientes() {
   const [listaClientes, setListaClientes] = useState([]);
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
 
+
   // ===============================
   // Obtener clientes
   // ===============================
@@ -21,15 +22,20 @@ export default function Clientes() {
     try {
 
       const clientes = await clienteService.obtenerClientes();
+
       setListaClientes(clientes);
 
     } catch (error) {
 
-      console.error("Error al obtener clientes:", error);
+      console.error(
+        "Error al obtener clientes:",
+        error
+      );
 
     }
 
   };
+
 
   useEffect(() => {
 
@@ -37,16 +43,26 @@ export default function Clientes() {
 
   }, []);
 
+
+
   // ===============================
-  // Columnas de la tabla
+  // Columnas tabla
   // ===============================
   const columnas = [
+
     { key: "nombre", label: "Nombre" },
+
     { key: "telefono", label: "Teléfono" },
+
     { key: "correo", label: "Correo" },
+
     { key: "ultimaCita", label: "Última cita" },
+
     { key: "totalVisitas", label: "Visitas" },
+
   ];
+
+
 
   // ===============================
   // Crear o actualizar
@@ -55,31 +71,75 @@ export default function Clientes() {
 
     try {
 
+
       if (clienteSeleccionado) {
 
+
         await clienteService.actualizarCliente(
+
           clienteSeleccionado.id,
+
           datosCliente
+
         );
+
+
+        alert(
+          "Cliente actualizado correctamente."
+        );
+
 
       } else {
 
+
         await clienteService.crearCliente(datosCliente);
+
+
+        alert(
+          "Cliente registrado correctamente."
+        );
+
 
       }
 
+
+
       await cargarClientes();
 
+
       setClienteSeleccionado(null);
+
       setMostrarFormulario(false);
+
+
 
     } catch (error) {
 
-      console.error("Error al guardar cliente:", error);
+
+      alert(
+
+        error.response?.data?.message ||
+
+        "Ocurrió un error al guardar el cliente."
+
+      );
+
+
+      console.error(
+
+        "Error al guardar cliente:",
+
+        error
+
+      );
+
 
     }
 
   };
+
+
+
 
   // ===============================
   // Editar
@@ -87,105 +147,209 @@ export default function Clientes() {
   const editarCliente = (cliente) => {
 
     setClienteSeleccionado(cliente);
+
     setMostrarFormulario(true);
 
   };
 
+
+
+
+
   // ===============================
   // Eliminar
   // ===============================
-  const eliminarCliente = async (id) => {
+  const eliminarCliente = async (cliente) => {
+
 
     const confirmar = window.confirm(
-      "¿Desea eliminar este cliente?"
+
+      `¿Desea eliminar al cliente ${cliente.nombre}?`
+
     );
+
+
 
     if (!confirmar) return;
 
+
+
     try {
 
-      await clienteService.eliminarCliente(id);
+
+      await clienteService.eliminarCliente(
+
+        cliente.id
+
+      );
+
+
+
+      alert(
+
+        "Cliente eliminado correctamente."
+
+      );
+
+
 
       await cargarClientes();
 
+
+
     } catch (error) {
 
-      console.error("Error al eliminar cliente:", error);
+
+      alert(
+
+        error.response?.data?.message ||
+
+        "No fue posible eliminar el cliente."
+
+      );
+
+
+
+      console.error(
+
+        "Error al eliminar cliente:",
+
+        error
+
+      );
+
 
     }
 
+
   };
+
+
 
   return (
 
     <div className="clientes">
 
+
       {!mostrarFormulario ? (
+
 
         <>
 
+
           <div className="clientes-header">
+
 
             <div>
 
-              <h1>Clientes</h1>
+
+              <h1>
+                Clientes
+              </h1>
+
 
               <p>
                 Administra los clientes registrados en la barbería.
               </p>
 
+
             </div>
 
+
+
             <button
+
               className="btn-primary"
+
               onClick={() => {
 
                 setClienteSeleccionado(null);
+
                 setMostrarFormulario(true);
 
               }}
+
             >
+
               + Nuevo Cliente
+
             </button>
 
+
           </div>
+
+
+
 
           <div className="clientes-toolbar">
 
+
             <input
+
               type="text"
+
               placeholder="Buscar cliente..."
+
               className="search-input"
+
             />
+
 
           </div>
 
+
+
+
           <DataTable
+
             columns={columnas}
+
             data={listaClientes}
+
             showActions={true}
+
             onEdit={editarCliente}
+
             onDelete={eliminarCliente}
+
           />
+
 
         </>
 
+
       ) : (
 
+
+
         <ClienteForm
+
           cliente={clienteSeleccionado}
+
+
           onCancel={() => {
 
+
             setClienteSeleccionado(null);
+
             setMostrarFormulario(false);
 
+
           }}
+
+
           onSave={guardarCliente}
+
+
         />
+
 
       )}
 
+
+
     </div>
+
 
   );
 

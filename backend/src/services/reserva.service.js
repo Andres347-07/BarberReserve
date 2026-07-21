@@ -14,24 +14,24 @@ class ReservaService {
                 {
                     model: Cliente,
                     as: "cliente",
-                    attributes: ["id", "nombre", "telefono"]
+                    attributes: ["id", "nombre", "telefono"],
                 },
 
                 {
                     model: Barbero,
                     as: "barbero",
-                    attributes: ["id", "nombre", "especialidad"]
+                    attributes: ["id", "nombre", "especialidad"],
                 },
 
                 {
                     model: Servicio,
                     as: "servicio",
-                    attributes: ["id", "nombre", "precio", "duracion"]
-                }
+                    attributes: ["id", "nombre", "precio", "duracion"],
+                },
 
             ],
 
-            order: [["fecha", "ASC"], ["hora", "ASC"]]
+            order: [["fecha", "ASC"], ["hora", "ASC"]],
 
         });
 
@@ -45,20 +45,20 @@ class ReservaService {
 
                 {
                     model: Cliente,
-                    as: "cliente"
+                    as: "cliente",
                 },
 
                 {
                     model: Barbero,
-                    as: "barbero"
+                    as: "barbero",
                 },
 
                 {
                     model: Servicio,
-                    as: "servicio"
-                }
+                    as: "servicio",
+                },
 
-            ]
+            ],
 
         });
 
@@ -88,9 +88,41 @@ class ReservaService {
 
             ...datos,
 
-            estado: "Pendiente"
+            estado: datos.estado || "Pendiente",
 
         });
+
+    }
+
+    async actualizar(id, datos) {
+
+        const reserva = await Reserva.findByPk(id);
+
+        if (!reserva) {
+
+            return null;
+
+        }
+
+        await reserva.update(datos);
+
+        return reserva;
+
+    }
+
+    async eliminar(id) {
+
+        const reserva = await Reserva.findByPk(id);
+
+        if (!reserva) {
+
+            return null;
+
+        }
+
+        await reserva.destroy();
+
+        return true;
 
     }
 

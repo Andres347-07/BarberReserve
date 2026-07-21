@@ -31,10 +31,12 @@ class ClienteController {
             const cliente = await clienteService.obtenerPorId(req.params.id);
 
             if (!cliente) {
+
                 return res.status(404).json({
                     success: false,
                     message: "Cliente no encontrado.",
                 });
+
             }
 
             return res.status(200).json({
@@ -66,6 +68,18 @@ class ClienteController {
             });
 
         } catch (error) {
+
+            if (
+                error.message.includes("teléfono") ||
+                error.message.includes("correo")
+            ) {
+
+                return res.status(409).json({
+                    success: false,
+                    message: error.message,
+                });
+
+            }
 
             return res.status(500).json({
                 success: false,
@@ -101,6 +115,18 @@ class ClienteController {
             });
 
         } catch (error) {
+
+            if (
+                error.message.includes("teléfono") ||
+                error.message.includes("correo")
+            ) {
+
+                return res.status(409).json({
+                    success: false,
+                    message: error.message,
+                });
+
+            }
 
             return res.status(500).json({
                 success: false,

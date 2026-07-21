@@ -9,12 +9,57 @@ export default function ClienteForm({
 }) {
 
     const [formulario, setFormulario] = useState({
-    nombre: cliente?.nombre || "",
-    telefono: cliente?.telefono || "",
-    correo: cliente?.correo || ""
-});
+        nombre: cliente?.nombre || "",
+        telefono: cliente?.telefono || "",
+        correo: cliente?.correo || ""
+    });
 
-    
+    const [errores, setErrores] = useState({});
+
+    const validarFormulario = () => {
+
+        const nuevosErrores = {};
+
+        // Nombre
+        if (!formulario.nombre.trim()) {
+
+            nuevosErrores.nombre = "El nombre es obligatorio.";
+
+        } else if (formulario.nombre.trim().length < 3) {
+
+            nuevosErrores.nombre = "El nombre debe tener mínimo 3 caracteres.";
+
+        }
+
+        // Teléfono
+        if (!formulario.telefono.trim()) {
+
+            nuevosErrores.telefono = "El teléfono es obligatorio.";
+
+        } else if (!/^[0-9]{10}$/.test(formulario.telefono)) {
+
+            nuevosErrores.telefono = "Debe contener exactamente 10 dígitos.";
+
+        }
+
+        // Correo
+        if (!formulario.correo.trim()) {
+
+            nuevosErrores.correo = "El correo es obligatorio.";
+
+        } else if (
+            !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formulario.correo)
+        ) {
+
+            nuevosErrores.correo = "Ingrese un correo válido.";
+
+        }
+
+        setErrores(nuevosErrores);
+
+        return Object.keys(nuevosErrores).length === 0;
+
+    };
 
     const handleChange = (e) => {
 
@@ -25,11 +70,22 @@ export default function ClienteForm({
             [name]: value
         }));
 
+        setErrores((prev) => ({
+            ...prev,
+            [name]: ""
+        }));
+
     };
 
     const handleSubmit = (e) => {
 
         e.preventDefault();
+
+        if (!validarFormulario()) {
+
+            return;
+
+        }
 
         onSave(formulario);
 
@@ -68,6 +124,12 @@ export default function ClienteForm({
                         placeholder="Ingrese el nombre completo"
                     />
 
+                    {errores.nombre && (
+                        <span className="error-text">
+                            {errores.nombre}
+                        </span>
+                    )}
+
                 </div>
 
                 <div className="form-group">
@@ -84,6 +146,12 @@ export default function ClienteForm({
                         placeholder="Ingrese el número telefónico"
                     />
 
+                    {errores.telefono && (
+                        <span className="error-text">
+                            {errores.telefono}
+                        </span>
+                    )}
+
                 </div>
 
                 <div className="form-group">
@@ -99,6 +167,12 @@ export default function ClienteForm({
                         onChange={handleChange}
                         placeholder="Ingrese el correo electrónico"
                     />
+
+                    {errores.correo && (
+                        <span className="error-text">
+                            {errores.correo}
+                        </span>
+                    )}
 
                 </div>
 
@@ -127,4 +201,4 @@ export default function ClienteForm({
 
     );
 
-}  
+}

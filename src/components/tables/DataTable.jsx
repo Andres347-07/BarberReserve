@@ -50,9 +50,15 @@ export default function DataTable({
               <tr key={row.id}>
 
                 {columns.map((col) => (
+
                   <td key={col.key}>
-                    {row[col.key]}
+
+                    {col.render
+                      ? col.render(row)
+                      : row[col.key]}
+
                   </td>
+
                 ))}
 
                 {showActions && (
@@ -68,7 +74,7 @@ export default function DataTable({
 
                     <button
                       className="btn-delete"
-                      onClick={() => onDelete && onDelete(row.id)}
+                      onClick={() => onDelete && onDelete(row)}
                     >
                       🗑️
                     </button>

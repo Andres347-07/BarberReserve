@@ -78,6 +78,72 @@ class ReservaController {
 
     }
 
+    async actualizar(req, res) {
+
+        try {
+
+            const reserva = await reservaService.actualizar(
+                req.params.id,
+                req.body
+            );
+
+            if (!reserva) {
+
+                return res.status(404).json({
+                    success: false,
+                    message: "Reserva no encontrada.",
+                });
+
+            }
+
+            return res.status(200).json({
+                success: true,
+                message: "Reserva actualizada correctamente.",
+                data: reserva,
+            });
+
+        } catch (error) {
+
+            return res.status(400).json({
+                success: false,
+                message: error.message,
+            });
+
+        }
+
+    }
+
+    async eliminar(req, res) {
+
+        try {
+
+            const eliminado = await reservaService.eliminar(req.params.id);
+
+            if (!eliminado) {
+
+                return res.status(404).json({
+                    success: false,
+                    message: "Reserva no encontrada.",
+                });
+
+            }
+
+            return res.status(200).json({
+                success: true,
+                message: "Reserva eliminada correctamente.",
+            });
+
+        } catch (error) {
+
+            return res.status(500).json({
+                success: false,
+                message: error.message,
+            });
+
+        }
+
+    }
+
 }
 
 module.exports = new ReservaController();

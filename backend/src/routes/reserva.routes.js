@@ -10,4 +10,8 @@ router.get("/:id", reservaController.obtenerPorId);
 
 router.post("/", reservaController.crear);
 
+router.put("/:id", reservaController.actualizar);
+
+router.delete("/:id", reservaController.eliminar);
+
 module.exports = router;

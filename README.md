@@ -1,330 +1,116 @@
-# BarberReserve
+#  BarberReserve
 
-Sistema web para la administración de barberías, desarrollado como proyecto académico de Ingeniería de Software.
+Sistema web para la gestión de reservas en barberías. Permite administrar clientes, barberos, servicios, horarios y citas desde una plataforma centralizada, construida con React en el frontend y una API REST en Node.js/Express respaldada por PostgreSQL.
 
----
+##  Descripción
 
-# Descripción
+Muchas barberías pequeñas y medianas gestionan sus reservas por teléfono, WhatsApp o agenda física, lo que genera conflictos de horario y falta de visibilidad sobre la operación diaria. BarberReserve centraliza esa gestión en una sola aplicación web, con un panel administrativo para registrar clientes, barberos, servicios y horarios, y para crear, editar y cancelar reservas.
 
-BarberReserve es una aplicación web orientada a la administración integral de una barbería, permitiendo gestionar clientes, barberos, servicios, horarios, reservas y la agenda diaria desde un panel administrativo.
 
-Actualmente el proyecto se encuentra en desarrollo bajo una arquitectura Frontend + Backend, donde el frontend ha sido desarrollado con React y el backend será implementado con Spring Boot.
+## Tecnologías
 
----
-
-# Objetivo
-
-Digitalizar el proceso de administración de una barbería mediante una plataforma moderna, intuitiva y escalable que facilite la gestión de la información y la organización del trabajo diario.
-
----
-
-# Estado del proyecto
-
-Actualmente el proyecto cuenta con:
-
-- ✅ Login
-- ✅ Dashboard Administrativo
-- ✅ Gestión de Clientes
-- ✅ Gestión de Barberos
-- ✅ Gestión de Servicios
-- ✅ Gestión de Horarios
-- ✅ Gestión de Reservas
-- ✅ Agenda Diaria
-- ✅ Componentes reutilizables
-- ⏳ Integración Backend (En desarrollo)
-- ⏳ Base de datos
-- ⏳ Autenticación JWT
-- ⏳ Roles de usuario
-
----
-
-# Arquitectura del Frontend
-
-El proyecto fue organizado siguiendo una arquitectura modular basada en componentes reutilizables.
-
-```
-src
-│
-├── assets
-│
-├── components
-│   ├── cards
-│   │     └── DashboardCard
-│   │
-│   ├── dashboard
-│   │     └── AgendaCard
-│   │
-│   ├── forms
-│   │     ├── ClienteForm
-│   │     ├── BarberoForm
-│   │     ├── ServicioForm
-│   │     ├── HorarioForm
-│   │     └── ReservaForm
-│   │
-│   ├── layout
-│   │     ├── Sidebar
-│   │     ├── Navbar
-│   │     └── Footer
-│   │
-│   └── tables
-│         ├── DataTable
-│         └── ReservasTable
-│
-├── layouts
-│     └── AdminLayout
-│
-├── mocks
-│
-├── pages
-│   ├── Login
-│   ├── Dashboard
-│   ├── Clientes
-│   ├── Barberos
-│   ├── Servicios
-│   ├── Horarios
-│   ├── Reservas
-│   ├── Agenda
-│   ├── DashboardBarbero
-│   ├── AgendaBarbero
-│   └── PerfilBarbero
-│
-├── routes
-│     └── AppRouter
-│
-├── App.jsx
-└── main.jsx
-```
-
----
-
-# Arquitectura implementada
-
-El proyecto sigue una arquitectura basada en separación de responsabilidades.
-
-## Pages
-
-Contienen las vistas principales del sistema.
-
-Cada página representa un módulo funcional independiente.
-
-Ejemplo:
-
-- Dashboard
-- Clientes
-- Barberos
-- Reservas
-
----
-
-## Components
-
-Contienen componentes reutilizables.
-
-Estos componentes pueden ser utilizados por múltiples páginas sin duplicar código.
-
-Ejemplo:
-
-- DashboardCard
-- DataTable
-- AgendaCard
-- ClienteForm
-
----
-
-## Layouts
-
-Los layouts controlan la estructura general de la aplicación.
-
-Actualmente existe:
-
-- AdminLayout
-
-En futuras versiones se implementará:
-
-- BarberoLayout
-
----
-
-## Routes
-
-Toda la navegación del proyecto se centraliza mediante React Router.
-
-Actualmente se utiliza un único archivo:
-
-AppRouter.jsx
-
-Esto facilita agregar nuevos módulos sin modificar el resto del sistema.
-
----
-
-## Mocks
-
-Durante el desarrollo del frontend se utilizaron datos simulados.
-
-Estos archivos serán reemplazados por servicios REST cuando el backend esté terminado.
-
----
-
-# Componentes desarrollados
-
-## DashboardCard
-
-Componente reutilizable para mostrar indicadores del Dashboard.
-
-Ejemplos:
-
-- Clientes
-- Barberos
-- Reservas
-- Servicios
-
----
-
-## DataTable
-
-Tabla reutilizable utilizada para los módulos administrativos.
-
-Permite mostrar información de forma uniforme.
-
----
-
-## AgendaCard
-
-Visualiza las próximas citas del día.
-
----
-
-## ReservasTable
-
-Tabla resumida de reservas recientes mostradas en el Dashboard.
-
----
-
-## Formularios
-
-Actualmente se encuentra desarrollado:
-
-- ClienteForm
-
-Y preparada la estructura para:
-
-- BarberoForm
-- ServicioForm
-- HorarioForm
-- ReservaForm
-
----
-
-#  Tecnologías utilizadas
-
-## Frontend
-
-- React
-- React Router DOM
+**Frontend**
+- React 19 + Vite
+- React Router DOM 7
+- Axios
 - React Icons
-- CSS3
-- JavaScript ES6+
-- Vite
+- CSS por módulo (sin framework de estilos)
 
----
+**Backend**
+- Node.js + Express 5
+- Sequelize 6 (ORM)
+- PostgreSQL
+- dotenv, cors
+- bcrypt y jsonwebtoken (instalados, aún no integrados — ver [Próximos pasos](#-próximos-pasos))
 
-## Herramientas de desarrollo
+**Herramientas**
+- Git y GitHub
+- ESLint (frontend)
+- nodemon (backend, entorno de desarrollo)
 
-- Visual Studio Code
-- Git
-- GitHub
+## Estructura del proyecto
+
+```
+BarberReserve/
+├── src/                        # Frontend (React)
+│   ├── pages/                  # Vistas: Login, Dashboard, Clientes, Barberos,
+│   │                           # Servicios, Horarios, Reservas, Agenda
+│   ├── components/
+│   │   ├── forms/              # ClienteForm, BarberoForm, ServicioForm,
+│   │   │                       # HorarioForm, ReservaForm
+│   │   ├── tables/             # DataTable, ReservasTable
+│   │   ├── cards/               # DashboardCard
+│   │   ├── dashboard/          # AgendaCard
+│   │   └── layout/              # Sidebar, Navbar, Footer
+│   ├── layouts/                 # AdminLayout (en uso), MainLayout (reservado a futuro)
+│   ├── routes/                  # AppRouter.jsx
+│   ├── services/                # Clientes Axios por recurso (clienteService, etc.)
+│   ├── mocks/                   # Datos simulados (Dashboard, Agenda, usuario)
+│   └── styles/
+│
+├── backend/                     # Backend (Node.js + Express)
+│   └── src/
+│       ├── routes/              # Definición de endpoints por recurso
+│       ├── controllers/         # Manejo de solicitudes HTTP
+│       ├── services/            # Lógica de negocio y acceso a datos
+│       ├── models/               # Modelos Sequelize (Cliente, Barbero, Servicio,
+│       │                        # Horario, Reserva) + asociaciones (index.js)
+│       ├── middlewares/          # auth.middleware.js, error.middleware.js (pendientes)
+│       ├── database/             # Conexión Sequelize
+│       ├── config/
+│       └── utils/                # response.js (pendiente)
+│
+└── README.md
+```
+
+
+### Requisitos previos
+- Node.js 18 o superior
+- PostgreSQL instalado y corriendo localmente (o accesible por red)
 - npm
 
----
 
-#  Dependencias principales
 
-```
-react
-react-dom
-react-router-dom
-react-icons
-vite
-```
+## API — Endpoints principales
 
----
+Todas las rutas parten de `/api` y responden en JSON con el formato `{ success, data }` (o `{ success: false, message }` en caso de error).
 
-# Diseño
+| Recurso    | Base             | Métodos disponibles                        |
+|------------|------------------|--------------------------------------------|
+| Clientes   | `/api/clientes`  | GET, GET /:id, POST, PUT /:id, DELETE /:id |
+| Barberos   | `/api/barberos`  | GET, GET /:id, POST, PUT /:id, DELETE /:id |
+| Servicios  | `/api/servicios` | GET, GET /:id, POST, PUT /:id, DELETE /:id |
+| Horarios   | `/api/horarios`  | GET, GET /:id, POST, PUT /:id, DELETE /:id |
+| Reservas   | `/api/reservas`  | GET, GET /:id, POST, PUT /:id, DELETE /:id |
 
-La interfaz fue desarrollada siguiendo un estilo moderno basado en:
 
-- Colores claros
-- Componentes reutilizables
-- Responsive Design
-- Tarjetas informativas
-- Navegación lateral
-- Dashboard administrativo
 
----
+## Modelo de datos
 
-# Próximas funcionalidades
+- **Cliente** — id, nombre, telefono, correo (único), ultimaCita, totalVisitas
+- **Barbero** — id, nombre, especialidad, telefono, correo (único), estado
+- **Servicio** — id, nombre, descripcion, duracion, precio, estado
+- **Horario** — id, barberoId (FK), diaSemana, horaInicio, horaFin, activo
+- **Reserva** — id, clienteId (FK), barberoId (FK), servicioId (FK), fecha, hora, estado (Pendiente/En proceso/Finalizada/Cancelada), observaciones
 
-Durante la integración del backend se implementará:
+Relaciones: un Cliente, un Barbero y un Servicio pueden tener muchas Reservas; un Barbero puede tener muchos Horarios.
 
-- Spring Boot
-- API REST
-- MySQL
-- Spring Security
-- JWT
-- Roles
+## Próximos pasos
 
-Administrador
+- [ ] Implementar autenticación (login funcional, cifrado de contraseñas con bcrypt, tokens JWT) y proteger las rutas del panel administrativo.
+- [ ] Validar la disponibilidad del barbero antes de confirmar una reserva.
+- [ ] Conectar el Dashboard y la Agenda a la API real, en reemplazo de los datos simulados.
+- [ ] Agregar un middleware centralizado de manejo de errores y conectarlo en `app.js`.
+- [ ] Agregar validaciones de campos (obligatorios, formato, longitud) en los formularios de Cliente, Barbero, Servicio y Horario.
+- [ ] Incorporar migraciones y seeders con Sequelize CLI en lugar de `sequelize.sync()`.
+- [ ] Completar el diseño responsive en las páginas de listado (Clientes, Barberos, Servicios, Horarios, Reservas).
+- [ ] Desarrollar el rol de barbero (layout, dashboard, agenda y perfil), ya reservado en la estructura del código (`MainLayout`, `PerfilBarbero`) pero sin implementar.
 
-Barbero
+##  Autor
 
----
+**Diego Andrés Peñaranda Soto**
+Ingeniería de Software — Fundación de Estudios Superiores Comfanorte (FESC)
 
-# Flujo de trabajo
-
-El proyecto se desarrolló siguiendo una estrategia incremental.
-
-1. Diseño de interfaces.
-
-2. Organización de carpetas.
-
-3. Creación de componentes reutilizables.
-
-4. Desarrollo de módulos.
-
-5. Implementación de formularios.
-
-6. Simulación mediante mocks.
-
-7. Integración con Backend.
-
-8. Despliegue.
-
----
-
-# Escalabilidad
-
-La arquitectura fue diseñada para facilitar futuras funcionalidades como:
-
-- Panel del Barbero.
-- Gestión de pagos.
-- Historial de clientes.
-- Reportes.
-- Notificaciones.
-- Reservas en línea.
-- Aplicación móvil.
-
----
-
-#  Autor
-
-Diego Andrés Peñaranda Soto
-
-Ingeniería de Software
-
-Fundación de Estudios Superiores Comfanorte (FESC)
-
----
-
-# Licencia
+## Licencia
 
 Proyecto desarrollado con fines académicos.
