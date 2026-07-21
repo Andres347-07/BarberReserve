@@ -2,6 +2,7 @@ const barberoService = require("../services/barbero.service");
 
 class BarberoController {
 
+
     async obtenerTodos(req, res) {
 
         try {
@@ -13,6 +14,7 @@ class BarberoController {
                 data: barberos,
             });
 
+
         } catch (error) {
 
             return res.status(500).json({
@@ -23,6 +25,8 @@ class BarberoController {
         }
 
     }
+
+
 
     async obtenerPorId(req, res) {
 
@@ -30,6 +34,7 @@ class BarberoController {
 
             const barbero = await barberoService.obtenerPorId(req.params.id);
 
+
             if (!barbero) {
 
                 return res.status(404).json({
@@ -39,10 +44,12 @@ class BarberoController {
 
             }
 
+
             return res.status(200).json({
                 success: true,
                 data: barbero,
             });
+
 
         } catch (error) {
 
@@ -54,96 +61,209 @@ class BarberoController {
         }
 
     }
+
+
 
     async crear(req, res) {
 
         try {
 
+
             const barbero = await barberoService.crear(req.body);
 
+
+
             return res.status(201).json({
+
                 success: true,
-                message: "Barbero creado correctamente.",
+
+                message:
+                    "Barbero creado correctamente.",
+
                 data: barbero,
+
             });
+
+
 
         } catch (error) {
 
+
+            if (
+                error.message.includes("teléfono") ||
+                error.message.includes("correo")
+            ) {
+
+
+                return res.status(409).json({
+
+                    success: false,
+
+                    message: error.message,
+
+                });
+
+
+            }
+
+
+
             return res.status(500).json({
+
                 success: false,
+
                 message: error.message,
+
             });
+
 
         }
 
     }
+
+
+
 
     async actualizar(req, res) {
 
+
         try {
 
-            const barbero = await barberoService.actualizar(
-                req.params.id,
-                req.body
-            );
+
+            const barbero =
+                await barberoService.actualizar(
+                    req.params.id,
+                    req.body
+                );
+
+
 
             if (!barbero) {
 
+
                 return res.status(404).json({
+
                     success: false,
-                    message: "Barbero no encontrado.",
+
+                    message:
+                        "Barbero no encontrado.",
+
                 });
+
 
             }
 
+
+
             return res.status(200).json({
+
                 success: true,
-                message: "Barbero actualizado correctamente.",
+
+                message:
+                    "Barbero actualizado correctamente.",
+
                 data: barbero,
+
             });
+
+
 
         } catch (error) {
 
+
+            if (
+                error.message.includes("teléfono") ||
+                error.message.includes("correo")
+            ) {
+
+
+                return res.status(409).json({
+
+                    success: false,
+
+                    message: error.message,
+
+                });
+
+
+            }
+
+
+
             return res.status(500).json({
+
                 success: false,
+
                 message: error.message,
+
             });
+
+
 
         }
 
     }
+
+
+
 
     async eliminar(req, res) {
 
+
         try {
 
-            const eliminado = await barberoService.eliminar(req.params.id);
+
+            const eliminado =
+                await barberoService.eliminar(req.params.id);
+
+
 
             if (!eliminado) {
 
+
                 return res.status(404).json({
+
                     success: false,
-                    message: "Barbero no encontrado.",
+
+                    message:
+                        "Barbero no encontrado.",
+
                 });
+
 
             }
 
+
+
             return res.status(200).json({
+
                 success: true,
-                message: "Barbero eliminado correctamente.",
+
+                message:
+                    "Barbero eliminado correctamente.",
+
             });
+
+
 
         } catch (error) {
 
+
             return res.status(500).json({
+
                 success: false,
+
                 message: error.message,
+
             });
+
 
         }
 
     }
 
+
 }
+
 
 module.exports = new BarberoController();

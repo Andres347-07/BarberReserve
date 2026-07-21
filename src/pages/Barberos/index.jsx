@@ -93,30 +93,43 @@ export default function Barberos() {
 
   };
 
-  // ===============================
-  // Eliminar
-  // ===============================
-  const eliminarBarbero = async (id) => {
+      // ===============================
+      // Eliminar
+      // ===============================
+      const eliminarBarbero = async (barbero) => {
 
-    const confirmar = window.confirm(
-      "¿Desea eliminar este barbero?"
-    );
+          const confirmar = window.confirm(
+          `¿Desea eliminar al barbero ${barbero.nombre}?`
+         );
 
-    if (!confirmar) return;
 
-    try {
+         if (!confirmar) return;
 
-      await barberoService.eliminarBarbero(id);
 
-      await cargarBarberos();
+         try {
 
-    } catch (error) {
 
-      console.error("Error al eliminar barbero:", error);
+           await barberoService.eliminarBarbero(
+            barbero.id
+           );
 
-    }
 
-  };
+           await cargarBarberos();
+
+
+
+         } catch (error) {
+
+
+           console.error(
+             "Error al eliminar barbero:",
+           error
+           );
+
+
+         }
+
+       };
 
   return (
 
