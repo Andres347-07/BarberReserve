@@ -1,6 +1,8 @@
 const { Op } = require("sequelize");
 
 const Cliente = require("../models/Cliente");
+const Reserva = require("../models/Reserva");
+const { validarNombre, validarTelefono, validarCorreo } = require("../utils/validarContacto");
 
 
 class ClienteService {
@@ -27,6 +29,10 @@ class ClienteService {
 
 
     async crear(datos) {
+
+        validarNombre(datos.nombre);
+        validarTelefono(datos.telefono);
+        validarCorreo(datos.correo);
 
 
         const telefonoExistente = await Cliente.findOne({
@@ -91,6 +97,9 @@ class ClienteService {
 
         }
 
+        if (datos.nombre !== undefined) validarNombre(datos.nombre);
+        if (datos.telefono !== undefined) validarTelefono(datos.telefono);
+        if (datos.correo !== undefined) validarCorreo(datos.correo);
 
 
         const telefonoExistente = await Cliente.findOne({
@@ -174,6 +183,17 @@ class ClienteService {
 
         }
 
+
+
+        const tieneReservas = await Reserva.count({ where: { clienteId: id } });
+
+        if (tieneReservas > 0) {
+
+            throw new Error(
+                "No es posible eliminar este cliente porque posee reservas asociadas."
+            );
+
+        }
 
 
         await cliente.destroy();

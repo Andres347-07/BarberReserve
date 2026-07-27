@@ -1,0 +1,91 @@
+.reservas-page{
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.reservas-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reservas-header h1{
+    margin-bottom: 6px;
+}
+
+.reservas-header p{
+    color: #6b7280;
+}
+
+.reservas-toolbar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-input{
+    width: 320px;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    outline: none;
+    font-size: 15px;
+}
+
+.search-input:focus{
+    border-color: #3366FF;
+}
+
+.btn-primary{
+    background: #3366FF;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-primary:hover{
+    background: #2952cc;
+}
+/* Estados visuales consistentes en todo el sistema (especificación 10.10) */
+.estado-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.estado-pendiente {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.estado-en-proceso {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.estado-finalizada {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+@media (max-width: 768px) {
+    .reservas-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .reservas-header .btn-primary {
+        width: 100%;
+    }
+
+    .search-input {
+        width: 100%;
+    }
+}

@@ -1,0 +1,21 @@
+# Dependencias — se reinstalan dentro del contenedor con npm ci
+node_modules
+
+# Nunca debe entrar al build: contiene credenciales locales; en Docker
+# las variables de entorno las define docker-compose, no este archivo.
+.env
+
+# Control de versiones
+.git
+.gitignore
+
+# Pruebas y configuración de pruebas — no se necesitan en la imagen de
+# ejecución (solo se usan en desarrollo local con `npm test`).
+src/tests
+jest.config.js
+
+# Documentación y artefactos varios
+README.md
+npm-debug.log*
+*.log
+.DS_Store

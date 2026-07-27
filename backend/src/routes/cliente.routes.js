@@ -2,20 +2,15 @@ const express = require("express");
 const router = express.Router();
 
 const clienteController = require("../controllers/cliente.controller");
+const auth = require("../middlewares/auth.middleware");
+const permitirRoles = require("../middlewares/role.middleware");
 
-// Obtener todos los clientes
-router.get("/", clienteController.obtenerTodos);
-
-// Obtener un cliente por ID
-router.get("/:id", clienteController.obtenerPorId);
-
-// Crear un cliente
-router.post("/", clienteController.crear);
-
-// Actualizar un cliente
-router.put("/:id", clienteController.actualizar);
-
-// Eliminar un cliente
-router.delete("/:id", clienteController.eliminar);
+// Módulo exclusivo del administrador 
+// "Los barberos no tendrán acceso a este módulo")
+router.get("/", auth, permitirRoles("admin"), clienteController.obtenerTodos);
+router.get("/:id", auth, permitirRoles("admin"), clienteController.obtenerPorId);
+router.post("/", auth, permitirRoles("admin"), clienteController.crear);
+router.put("/:id", auth, permitirRoles("admin"), clienteController.actualizar);
+router.delete("/:id", auth, permitirRoles("admin"), clienteController.eliminar);
 
 module.exports = router;

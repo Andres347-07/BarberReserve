@@ -1,0 +1,69 @@
+services:
+
+  # ── PostgreSQL ───────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: barberreserve_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-barberreserve}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en el archivo .env de la raíz (ver .env.example)}
+    ports:
+      - "5432:5432"
+    volumes:
+      # Volumen nombrado: los datos sobreviven a "docker compose down" y a
+      # reconstrucciones de la imagen. Solo se pierden si además se corre
+      # "docker compose down -v".
+      - barberreserve_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-barberreserve}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── Backend (Node.js + Express) ─────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+    container_name: barberreserve_backend
+    restart: unless-stopped
+    environment:
+      PORT: 4000
+      # "postgres" es el nombre del servicio de arriba: dentro de la red
+      # interna de Docker Compose, ese nombre resuelve a la IP del
+      # contenedor de la base de datos (no se usa localhost aquí).
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-barberreserve}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en el archivo .env de la raíz (ver .env.example)}
+      JWT_SECRET: ${JWT_SECRET:?Define JWT_SECRET en el archivo .env de la raíz (ver .env.example)}
+    ports:
+      - "4000:4000"
+    depends_on:
+      # No basta con que el contenedor de Postgres exista: se espera a que
+      # su healthcheck confirme que ya acepta conexiones, para que el
+      # backend no falle su primer intento de conexión al arrancar.
+      postgres:
+        condition: service_healthy
+
+  # ── Frontend (React + Vite, servido por Nginx) ──────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # La URL que queda incrustada en el bundle es la que el NAVEGADOR
+        # usa desde el host — por eso sigue siendo localhost:4000 (el
+        # puerto publicado más abajo), no "http://backend:4000".
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:4000/api}
+    container_name: barberreserve_frontend
+    restart: unless-stopped
+    ports:
+      - "5174:80"
+    depends_on:
+      - backend
+
+volumes:
+  barberreserve_db_data:
+    name: barberreserve_db_data

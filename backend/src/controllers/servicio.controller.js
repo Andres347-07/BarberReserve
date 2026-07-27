@@ -63,13 +63,13 @@ class ServicioController {
 
             return res.status(201).json({
                 success: true,
-                message: "Servicio creado correctamente.",
+                message: "Servicio registrado correctamente.",
                 data: servicio,
             });
 
         } catch (error) {
 
-            return res.status(500).json({
+            return res.status(400).json({
                 success: false,
                 message: error.message,
             });
@@ -104,7 +104,7 @@ class ServicioController {
 
         } catch (error) {
 
-            return res.status(500).json({
+            return res.status(400).json({
                 success: false,
                 message: error.message,
             });
@@ -134,6 +134,15 @@ class ServicioController {
             });
 
         } catch (error) {
+
+            if (error.message.includes("reservas asociadas")) {
+
+                return res.status(409).json({
+                    success: false,
+                    message: error.message,
+                });
+
+            }
 
             return res.status(500).json({
                 success: false,

@@ -35,12 +35,18 @@ const Reserva = sequelize.define(
             allowNull: false,
         },
 
+        duracion: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            comment: "Duración en minutos, copiada del servicio al momento de crear la reserva.",
+        },
+
+        
         estado: {
             type: DataTypes.ENUM(
                 "Pendiente",
                 "En proceso",
-                "Finalizada",
-                "Cancelada"
+                "Finalizada"
             ),
             defaultValue: "Pendiente",
             allowNull: false,

@@ -159,6 +159,15 @@ class ClienteController {
 
         } catch (error) {
 
+            if (error.message.includes("reservas asociadas")) {
+
+                return res.status(409).json({
+                    success: false,
+                    message: error.message,
+                });
+
+            }
+
             return res.status(500).json({
                 success: false,
                 message: error.message,

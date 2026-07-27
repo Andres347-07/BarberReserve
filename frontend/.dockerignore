@@ -1,0 +1,14 @@
+# Se reinstalan dentro del contenedor con npm ci
+node_modules
+
+# Se regenera con "npm run build" dentro del contenedor
+dist
+
+.env
+.git
+.gitignore
+
+README.md
+npm-debug.log*
+*.log
+.DS_Store

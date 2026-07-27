@@ -1,0 +1,181 @@
+.dashboard{
+
+    display:flex;
+    flex-direction:column;
+    gap:30px;
+
+}
+
+.dashboard-header{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+}
+
+.dashboard-header h1{
+
+    font-size:32px;
+    margin-bottom:8px;
+
+}
+
+.dashboard-header p{
+
+    color:#6B7280;
+
+}
+
+.date-btn{
+
+    background:#3366FF;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:10px;
+    font-weight:600;
+    cursor:pointer;
+
+}
+
+.cards{
+
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+
+}
+
+.dashboard-body{
+
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:20px;
+
+}
+
+.reservas,
+.agenda{
+
+    background:white;
+    border-radius:16px;
+    padding:25px;
+    box-shadow:0 8px 20px rgba(0,0,0,.05);
+
+}
+
+.placeholder{
+
+    margin-top:20px;
+    border:2px dashed #D1D5DB;
+    border-radius:12px;
+    height:260px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#94A3B8;
+
+}
+
+.dashboard-role{
+
+    display:inline-block;
+    margin:10px 0;
+    background:#EAF1FF;
+    color:#3366FF;
+    padding:6px 15px;
+    border-radius:30px;
+    font-size:14px;
+    font-weight:600;
+
+}
+
+/* ========================= */
+/* Responsive */
+/* ========================= */
+
+@media (max-width:1200px){
+
+    .cards{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+}
+
+@media (max-width:900px){
+
+    .dashboard-header{
+
+        flex-direction:column;
+        align-items:flex-start;
+        gap:20px;
+
+    }
+
+    .dashboard-body{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+@media (max-width:600px){
+
+    .cards{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .dashboard-header h1{
+
+        font-size:26px;
+
+    }
+
+    .date-btn{
+
+        width:100%;
+
+    }
+
+}
+.accesos-rapidos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.proxima-cita {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #eff6ff;
+    color: #1e40af;
+    padding: 14px 18px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.actividad-reciente {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.actividad-reciente li {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+    color: #374151;
+    font-size: 14px;
+}
+
+.actividad-reciente li:last-child {
+    border-bottom: none;
+}

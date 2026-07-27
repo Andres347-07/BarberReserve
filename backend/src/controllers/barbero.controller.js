@@ -69,7 +69,7 @@ class BarberoController {
         try {
 
 
-            const barbero = await barberoService.crear(req.body);
+            const { barbero, passwordTemporal } = await barberoService.crear(req.body);
 
 
 
@@ -78,9 +78,9 @@ class BarberoController {
                 success: true,
 
                 message:
-                    "Barbero creado correctamente.",
+                    "Barbero registrado correctamente. Se creó su usuario de acceso.",
 
-                data: barbero,
+                data: { ...barbero.toJSON(), passwordTemporal },
 
             });
 
@@ -247,6 +247,16 @@ class BarberoController {
 
 
         } catch (error) {
+
+
+            if (error.message.includes("información relacionada")) {
+
+                return res.status(409).json({
+                    success: false,
+                    message: error.message,
+                });
+
+            }
 
 
             return res.status(500).json({

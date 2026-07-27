@@ -32,7 +32,8 @@ const Barbero = sequelize.define(
         },
 
         estado: {
-            type: DataTypes.STRING,
+            type: DataTypes.ENUM("Activo", "Inactivo"),
+            allowNull: false,
             defaultValue: "Activo",
         },
     },

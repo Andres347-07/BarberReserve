@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../database/connection");
 
+
 const Horario = sequelize.define(
     "Horario",
     {
@@ -15,29 +16,42 @@ const Horario = sequelize.define(
             allowNull: false,
         },
 
-        diaSemana: {
-            type: DataTypes.STRING,
+        fecha: {
+            type: DataTypes.DATEONLY,
             allowNull: false,
+        },
+
+        semana: {
+            type: DataTypes.DATEONLY,
+            allowNull: true,
         },
 
         horaInicio: {
             type: DataTypes.TIME,
-            allowNull: false,
+            allowNull: true,
         },
 
         horaFin: {
             type: DataTypes.TIME,
-            allowNull: false,
+            allowNull: true,
         },
 
-        activo: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: true,
+        estado: {
+            type: DataTypes.ENUM("Activo", "Descanso"),
+            allowNull: false,
+            defaultValue: "Activo",
         },
     },
     {
         tableName: "horarios",
         timestamps: true,
+        indexes: [
+            {
+                unique: true,
+                fields: ["barberoId", "fecha"],
+                name: "horarios_barbero_fecha_unique",
+            },
+        ],
     }
 );
 
