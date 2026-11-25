@@ -26,7 +26,7 @@ describe("cliente.service — eliminación bloqueada por reservas asociadas", ()
 
         await horarioService.crear({
             barberoId: barbero.id,
-            fecha: "2026-08-03",
+            fecha: "2099-08-03",
             horaInicio: "08:00",
             horaFin: "14:00",
             estado: "Activo",
@@ -48,7 +48,7 @@ describe("cliente.service — eliminación bloqueada por reservas asociadas", ()
             clienteId: clienteConReserva.id,
             barberoId: barbero.id,
             servicioId: servicio.id,
-            fecha: "2026-08-03",
+            fecha: "2099-08-03",
             hora: "09:00",
         });
     });

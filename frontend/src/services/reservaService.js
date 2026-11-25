@@ -9,10 +9,10 @@ const reservaService = {
 
     },
 
-    async obtenerHorasDisponibles(barberoId, fecha, servicioId) {
+    async obtenerHorasDisponibles(barberoId, fecha, servicioId, excluirReservaId) {
 
         const { data } = await api.get("/reservas/horas-disponibles", {
-            params: { barberoId, fecha, servicioId },
+            params: { barberoId, fecha, servicioId, excluirReservaId },
         });
         return data.data;
 
@@ -28,6 +28,13 @@ const reservaService = {
     async actualizarReserva(id, reserva) {
 
         const { data } = await api.put(`/reservas/${id}`, reserva);
+        return data;
+
+    },
+
+    async cancelarReserva(id) {
+
+        const { data } = await api.patch(`/reservas/${id}/cancelar`);
         return data;
 
     },

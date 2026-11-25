@@ -68,9 +68,20 @@ export default function Barberos() {
 
     { key: "nombre", label: "Nombre" },
     { key: "especialidad", label: "Especialidad" },
+    {
+      key: "servicios",
+      label: "Servicios",
+      render: (row) => (row.servicios && row.servicios.length > 0
+        ? row.servicios.map((s) => s.nombre).join(", ")
+        : <span className="texto-suave">Todos</span>),
+    },
     { key: "telefono", label: "Teléfono" },
     { key: "correo", label: "Correo" },
-    { key: "estado", label: "Estado" },
+    {
+      key: "estado",
+      label: "Estado",
+      render: (row) => <span className={`estado-badge estado-${String(row.estado).toLowerCase()}`}>{row.estado}</span>,
+    },
 
   ];
 
@@ -236,7 +247,8 @@ export default function Barberos() {
           <div className="barberos-toolbar">
 
             <input
-              type="text"
+              type="search"
+              aria-label="Buscar barberos por nombre"
               placeholder="Buscar barbero por nombre..."
               className="search-input"
               value={busqueda}
@@ -246,6 +258,7 @@ export default function Barberos() {
           </div>
 
           <DataTable
+            caption="Barberos registrados"
             columns={columnas}
             data={barberosFiltrados}
             showActions={true}

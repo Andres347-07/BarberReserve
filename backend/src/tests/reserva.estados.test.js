@@ -1,6 +1,7 @@
 const sequelize = require("../database/connection");
 const { Barbero, Cliente, Servicio, Reserva } = require("../models");
 const reservaService = require("../services/reserva.service");
+const configuracionService = require("../services/configuracion.service");
 const horarioService = require("../services/horario.service");
 
 beforeAll(async () => {
@@ -38,18 +39,24 @@ describe("reserva.service — horas disponibles (algoritmo de la especificación
 
         await horarioService.crear({
             barberoId: barbero.id,
-            fecha: "2026-08-20",
+            fecha: "2099-08-20",
             horaInicio: "08:00",
             horaFin: "18:00",
             estado: "Activo",
         });
+
+        // Barber Reserve 2.1 ofrece cupos cada 15 minutos con 5 minutos de
+        // limpieza. Esta prueba verifica el algoritmo ORIGINAL de la
+        // especificación 9.6, que sigue disponible con intervalo 0 ("según la
+        // duración del servicio") y sin limpieza.
+        await configuracionService.actualizar({ intervaloCupos: 0, minutosLimpieza: 0 });
 
         for (const hora of ["09:30", "11:00", "15:15"]) {
             await Reserva.create({
                 clienteId: cliente.id,
                 barberoId: barbero.id,
                 servicioId: servicio.id,
-                fecha: "2026-08-20",
+                fecha: "2099-08-20",
                 hora,
                 duracion: 45,
                 estado: "Pendiente",
@@ -60,7 +67,7 @@ describe("reserva.service — horas disponibles (algoritmo de la especificación
     test("calcula las horas disponibles exactamente como en el ejemplo de la especificación", async () => {
         const horas = await reservaService.obtenerHorasDisponibles({
             barberoId: barbero.id,
-            fecha: "2026-08-20",
+            fecha: "2099-08-20",
             servicioId: servicio.id,
         });
 
@@ -73,7 +80,7 @@ describe("reserva.service — horas disponibles (algoritmo de la especificación
     test("devuelve un arreglo vacío si el barbero no tiene turno ese día", async () => {
         const horas = await reservaService.obtenerHorasDisponibles({
             barberoId: barbero.id,
-            fecha: "2026-08-21",
+            fecha: "2099-08-21",
             servicioId: servicio.id,
         });
 
@@ -110,7 +117,7 @@ describe("reserva.service — estados secuenciales del barbero y actualización 
 
         await horarioService.crear({
             barberoId: barbero.id,
-            fecha: "2026-08-24",
+            fecha: "2099-08-24",
             horaInicio: "08:00",
             horaFin: "14:00",
             estado: "Activo",
@@ -120,7 +127,7 @@ describe("reserva.service — estados secuenciales del barbero y actualización 
             clienteId: cliente.id,
             barberoId: barbero.id,
             servicioId: servicio.id,
-            fecha: "2026-08-24",
+            fecha: "2099-08-24",
             hora: "09:00",
         });
     });
@@ -163,7 +170,7 @@ describe("reserva.service — estados secuenciales del barbero y actualización 
         expect(actualizada.estado).toBe("Finalizada");
 
         const clienteActualizado = await Cliente.findByPk(cliente.id);
-        expect(clienteActualizado.ultimaCita).toBe("2026-08-24");
+        expect(clienteActualizado.ultimaCita).toBe("2099-08-24");
         expect(clienteActualizado.totalVisitas).toBe(3);
     });
 

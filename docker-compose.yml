@@ -39,6 +39,8 @@ services:
       DB_USER: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en el archivo .env de la raíz (ver .env.example)}
       JWT_SECRET: ${JWT_SECRET:?Define JWT_SECRET en el archivo .env de la raíz (ver .env.example)}
+      # Zona horaria de la barbería: define qué es "hoy" y qué horarios ya pasaron.
+      APP_TIMEZONE: ${APP_TIMEZONE:-America/Bogota}
     ports:
       - "4000:4000"
     depends_on:

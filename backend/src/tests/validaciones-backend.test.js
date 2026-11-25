@@ -73,7 +73,7 @@ describe("Horarios — un barbero Inactivo no puede recibir turnos (8.11 / 13.6)
         await expect(
             horarioService.crear({
                 barberoId: barberoInactivo.id,
-                fecha: "2026-09-01",
+                fecha: "2099-09-01",
                 horaInicio: "08:00",
                 horaFin: "14:00",
                 estado: "Activo",
@@ -85,8 +85,8 @@ describe("Horarios — un barbero Inactivo no puede recibir turnos (8.11 / 13.6)
         await expect(
             horarioService.crearSemana({
                 barberoId: barberoInactivo.id,
-                semana: "2026-09-01",
-                dias: [{ fecha: "2026-09-01", horaInicio: "08:00", horaFin: "14:00", estado: "Activo" }],
+                semana: "2099-09-01",
+                dias: [{ fecha: "2099-09-01", horaInicio: "08:00", horaFin: "14:00", estado: "Activo" }],
             })
         ).rejects.toThrow(/Inactivo/);
     });

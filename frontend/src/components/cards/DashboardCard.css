@@ -1,42 +1,60 @@
 .dashboard-card{
-
-    background:#ffffff;
-    border-radius:18px;
-    padding:25px;
-    box-shadow:0 5px 15px rgba(0,0,0,.08);
-
     display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-
-    transition:all .25s ease;
-
+    align-items:center;
+    gap:16px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-lg);
+    padding:20px;
+    box-shadow:var(--shadow-sm);
+    transition:box-shadow .15s ease, transform .15s ease;
 }
 
 .dashboard-card:hover{
-
-    transform:translateY(-4px);
-    box-shadow:0 10px 25px rgba(0,0,0,.12);
-
+    box-shadow:var(--shadow);
 }
 
-.dashboard-card h3{
-
-    color:#6B7280;
-    font-size:16px;
-    font-weight:600;
-    margin-bottom:18px;
-
+.dashboard-card-icono{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    width:48px;
+    height:48px;
+    border-radius:12px;
+    font-size:1.25rem;
+    background:var(--brand-50);
+    color:var(--brand-600);
 }
 
-.dashboard-card span{
-
-    font-size:42px;
+.dashboard-card-valor{
+    font-size:1.75rem;
     font-weight:700;
-    color:#3366FF;
-    line-height:1;
+    color:var(--text-strong);
+    line-height:1.1;
+    font-variant-numeric:tabular-nums;
+}
 
+.dashboard-card-titulo{
+    color:var(--text-muted);
+    font-size:.9rem;
+    font-weight:500;
 }
-.dashboard-card-icono {
-    margin-right: 8px;
+
+.dashboard-card-descripcion{
+    color:var(--text-muted);
+    font-size:.8rem;
 }
+
+.dashboard-card-exito .dashboard-card-icono{ background:var(--success-50); color:var(--success-700); }
+.dashboard-card-alerta .dashboard-card-icono{ background:var(--warning-50); color:var(--warning-700); }
+.dashboard-card-info .dashboard-card-icono{ background:var(--info-50); color:var(--info-700); }
+.dashboard-card-neutro .dashboard-card-icono{ background:var(--neutral-50); color:var(--neutral-700); }
+.dashboard-card-oscuro{
+    background:var(--ink-900);
+    border-color:var(--ink-900);
+}
+.dashboard-card-oscuro .dashboard-card-valor{ color:#fff; }
+.dashboard-card-oscuro .dashboard-card-titulo,
+.dashboard-card-oscuro .dashboard-card-descripcion{ color:var(--text-on-dark-muted); }
+.dashboard-card-oscuro .dashboard-card-icono{ background:rgba(142,168,255,.16); color:var(--brand-on-dark); }

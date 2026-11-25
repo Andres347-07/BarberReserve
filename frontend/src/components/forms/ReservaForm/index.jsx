@@ -6,6 +6,7 @@ import clienteService from "../../../services/clienteService";
 import barberoService from "../../../services/barberoService";
 import servicioService from "../../../services/servicioService";
 import reservaService from "../../../services/reservaService";
+import { hoyISO } from "../../../utils/fechas";
 
 export default function ReservaForm({
   reserva = null,
@@ -69,7 +70,7 @@ export default function ReservaForm({
     setMensajeHoras("");
 
     reservaService
-      .obtenerHorasDisponibles(barberoId, fecha, servicioId)
+      .obtenerHorasDisponibles(barberoId, fecha, servicioId, reserva?.id)
       .then((horas) => {
         setHorasDisponibles(horas);
 
@@ -109,9 +110,10 @@ export default function ReservaForm({
       <form
         className="reserva-form"
         onSubmit={handleSubmit}
+        aria-labelledby="titulo-reserva-form"
       >
 
-        <h2>
+        <h2 id="titulo-reserva-form">
           {reserva ? "Editar Reserva" : "Nueva Reserva"}
         </h2>
 
@@ -123,9 +125,10 @@ export default function ReservaForm({
 
         <div className="form-group">
 
-          <label>Cliente</label>
+          <label htmlFor="campo-clienteId">Cliente</label>
 
           <select
+                        id="campo-clienteId"
             name="clienteId"
             value={formulario.clienteId}
             onChange={handleChange}
@@ -141,27 +144,36 @@ export default function ReservaForm({
 
         <div className="form-group">
 
-          <label>Barbero</label>
+          <label htmlFor="campo-barberoId">Barbero</label>
 
           <select
+                        id="campo-barberoId"
             name="barberoId"
             value={formulario.barberoId}
             onChange={handleChange}
             required
           >
             <option value="">Seleccione un barbero</option>
-            {barberos.map((barbero) => (
-              <option key={barbero.id} value={barbero.id}>{barbero.nombre}</option>
-            ))}
+            {barberos.map((barbero) => {
+              // 2.1: un barbero con servicios asignados solo atiende esos servicios.
+              const noRealiza = formulario.servicioId && barbero.servicios?.length > 0
+                && !barbero.servicios.some((s) => String(s.id) === String(formulario.servicioId));
+              return (
+                <option key={barbero.id} value={barbero.id} disabled={noRealiza}>
+                  {barbero.nombre}{noRealiza ? " (no realiza este servicio)" : ""}
+                </option>
+              );
+            })}
           </select>
 
         </div>
 
         <div className="form-group">
 
-          <label>Servicio</label>
+          <label htmlFor="campo-servicioId">Servicio</label>
 
           <select
+                        id="campo-servicioId"
             name="servicioId"
             value={formulario.servicioId}
             onChange={handleChange}
@@ -169,7 +181,7 @@ export default function ReservaForm({
           >
             <option value="">Seleccione un servicio</option>
             {servicios.map((servicio) => (
-              <option key={servicio.id} value={servicio.id}>{servicio.nombre}</option>
+              <option key={servicio.id} value={servicio.id}>{servicio.nombre} — {servicio.duracion} min</option>
             ))}
           </select>
 
@@ -177,11 +189,13 @@ export default function ReservaForm({
 
         <div className="form-group">
 
-          <label>Fecha</label>
+          <label htmlFor="campo-fecha">Fecha</label>
 
           <input
+                        id="campo-fecha"
             type="date"
             name="fecha"
+            min={hoyISO()}
             value={formulario.fecha}
             onChange={handleChange}
             required
@@ -191,10 +205,12 @@ export default function ReservaForm({
 
         <div className="form-group">
 
-          <label>Hora disponible</label>
+          <label htmlFor="campo-hora">Hora disponible</label>
 
           <select
+                        id="campo-hora"
             name="hora"
+            aria-describedby={mensajeHoras ? "error-hora" : undefined}
             value={formulario.hora}
             onChange={handleChange}
             required
@@ -208,15 +224,21 @@ export default function ReservaForm({
             ))}
           </select>
 
-          {mensajeHoras && <span className="error-text">{mensajeHoras}</span>}
+          <div aria-live="polite">
+            {mensajeHoras && <span className="error-text" id="error-hora">{mensajeHoras}</span>}
+            {!mensajeHoras && (!formulario.barberoId || !formulario.servicioId || !formulario.fecha) && (
+              <span className="campo-ayuda">Seleccione barbero, servicio y fecha para ver las horas libres.</span>
+            )}
+          </div>
 
         </div>
 
         <div className="form-group">
 
-          <label>Observaciones</label>
+          <label htmlFor="campo-observaciones">Observaciones</label>
 
           <textarea
+                        id="campo-observaciones"
             name="observaciones"
             rows="4"
             value={formulario.observaciones}

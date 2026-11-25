@@ -5,7 +5,7 @@ Sistema web para la gestión de reservas en barberías, con dos roles — **admi
 ![Node](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-76%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-139%20passing-brightgreen)
 ![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)
 
 ## Tabla de contenido
@@ -16,7 +16,7 @@ Sistema web para la gestión de reservas en barberías, con dos roles — **admi
 4. [Tecnologías](#️-tecnologías)
 5. [Estructura del proyecto](#-estructura-del-proyecto)
 6. [Instalación y configuración](#️-instalación-y-configuración)
-7. [Ejecutar con Docker](#-ejecutar-con-docker)
+7. [Ejecutar con Docker](#-ejecutar-con-docker) · [Desplegar en Render](DESPLIEGUE-RENDER.md)
 8. [Scripts disponibles](#-scripts-disponibles)
 9. [Variables de entorno](#-variables-de-entorno)
 10. [Cómo probar el sistema](#-cómo-probar-el-sistema)
@@ -30,6 +30,21 @@ Sistema web para la gestión de reservas en barberías, con dos roles — **admi
 Muchas barberías pequeñas y medianas gestionan sus reservas por teléfono, WhatsApp o agenda física, lo que genera conflictos de horario y falta de visibilidad sobre la operación diaria. BarberReserve centraliza esa gestión en una sola aplicación web: el administrador gestiona clientes, barberos, servicios, la planificación semanal de turnos y las cuentas de usuario; cada barbero, desde su propia sesión, consulta su Agenda del día y avanza el estado de sus citas.
 
 Al crear una reserva, el sistema **calcula automáticamente las horas realmente disponibles** para el barbero, el servicio y la fecha elegidos — en ningún momento se escribe una hora a mano.
+
+## Novedades de Barber Reserve 2.0
+
+- **Portal público de clientes** (`/`, `/reservar`, `/mi-reserva`), sin iniciar sesión: servicios con precio y duración, elección de barbero, **calendario visual** con los días y horas realmente libres, registro con nombre/teléfono/correo, **código de reserva** (`BR-XXXXXX`) para consultar el estado y cancelar.
+- **Estado "Cancelada"**: la reserva se conserva en el historial y su horario se libera de inmediato. El administrador también puede cancelar desde el módulo Reservas.
+- **Reglas reforzadas en el servidor y en la base de datos**: sin horarios pasados (según `APP_TIMEZONE`), sin cruces del mismo barbero ni del mismo cliente, bloqueo transaccional ante solicitudes simultáneas y restricción `EXCLUDE` de PostgreSQL como última barrera. Un turno no puede pasarse a Descanso, recortarse ni eliminarse si deja reservas activas por fuera.
+- **Accesibilidad WCAG 2.2 AA** como objetivo: navegación completa por teclado, enlace "saltar al contenido", foco visible, etiquetas asociadas, errores anunciados, modales accesibles, tablas con `caption` y contraste corregido.
+- **Identidad visual refinada** (mismo navy `#111827` y azul `#3366FF`, con tonos derivados de mayor contraste) y diseño adaptable a móvil.
+- Migración **automática e idempotente** al arrancar el backend: una base de datos de la versión 1.0 se actualiza sin perder información.
+
+Detalle completo en [`CAMBIOS-2.0.md`](CAMBIOS-2.0.md).
+
+## Novedades de Barber Reserve 2.1
+
+Lógica de barbería basada en plataformas reales: plantilla semanal con horario corrido o partido (almuerzo), excepciones por fecha, bloqueos, servicios por barbero, "Cualquier barbero disponible", limpieza entre clientes, estados En espera / No asistió, notificaciones y configuración del negocio. Accesibilidad para el examen: preferencias de interfaz (alto contraste, tamaño de texto, reducir movimiento), video con subtítulos y declaración de accesibilidad. Detalle en [`CAMBIOS-2.1.md`](CAMBIOS-2.1.md).
 
 ## Roles y accesos
 
@@ -84,7 +99,7 @@ BarberReserve/
 │       ├── models/                # Cliente, Barbero, Servicio, Horario, Reserva, Usuario
 │       ├── routes/
 │       ├── services/              # lógica de negocio (incl. horas disponibles, contraseñas)
-│       ├── tests/                 # 76 pruebas Jest + Supertest
+│       ├── tests/                 # 118 pruebas Jest + Supertest
 │       ├── utils/                 # jwt, response, generarPassword, validarContacto
 │       ├── app.js
 │       └── server.js
@@ -268,6 +283,13 @@ docker compose up -d
 | `DB_USER`                | `postgres`      | Usuario de PostgreSQL                                            |
 | `DB_PASSWORD`            | —               | Contraseña de PostgreSQL (sin valor por defecto)                 |
 | `JWT_SECRET`             | —               | Clave para firmar los tokens de sesión (sin valor por defecto)   |
+| `APP_TIMEZONE`           | `America/Bogota`| Zona horaria de la barbería: define "hoy" y qué horarios ya pasaron |
+| `DATABASE_URL`           | —               | Solo en la nube: reemplaza las variables `DB_*`                   |
+| `DB_SSL`                 | `true`          | Activa SSL (URL externa de Render o Neon)                         |
+| `CORS_ORIGIN`            | `https://barberreserve-diego.onrender.com` | Dominios del frontend autorizados (sin la variable se acepta cualquiera) |
+| `TRUST_PROXY`            | `true`          | Detrás de un proxy: el límite de solicitudes usa la IP real       |
+
+El despliegue gratuito en Render está explicado paso a paso en [`DESPLIEGUE-RENDER.md`](DESPLIEGUE-RENDER.md).
 
 **`.env`** en la raíz (solo para Docker Compose — copia el `.env.example` de la raíz)
 
@@ -288,7 +310,7 @@ cd backend
 # CREATE DATABASE barberreserve_test;
 npm test
 ```
-Debes ver **76 pruebas pasando**, cubriendo: autenticación y roles, permisos por módulo, CRUD y validaciones de Clientes/Barberos/Servicios, turnos semanales, el algoritmo de horas disponibles (verificado contra el ejemplo exacto del documento oficial), estados secuenciales de reservas, actualización automática del cliente al finalizar un servicio, Agenda, Dashboard, Gestión de Usuarios, y el flujo completo de contraseñas.
+Debes ver **118 pruebas pasando** (76 originales + 42 de la versión 2.0: portal público, concurrencia, cancelaciones, horarios pasados y restricciones de base de datos), cubriendo: autenticación y roles, permisos por módulo, CRUD y validaciones de Clientes/Barberos/Servicios, turnos semanales, el algoritmo de horas disponibles (verificado contra el ejemplo exacto del documento oficial), estados secuenciales de reservas, actualización automática del cliente al finalizar un servicio, Agenda, Dashboard, Gestión de Usuarios, y el flujo completo de contraseñas.
 
 > `src/tests/jest.setup.js` fuerza el uso de la base de datos `barberreserve_test` (nombre fijo) para las pruebas, sin importar lo que tengas configurado en tu `.env`. Créala una vez y queda lista para todas las corridas futuras.
 
@@ -306,7 +328,7 @@ Debes ver **76 pruebas pasando**, cubriendo: autenticación y roles, permisos po
 
 ##  API — Endpoints principales
 
-Todas las rutas (salvo `/api/auth/register` y `/api/auth/login`) requieren `Authorization: Bearer <token>`.
+Todas las rutas (salvo `/api/auth/register`, `/api/auth/login` y `/api/publico/*`) requieren `Authorization: Bearer <token>`.
 
 | Recurso          | Ruta base                                       | Acceso                                                                        |
 |------------------|-------------------------------------------------|-------------------------------------------------------------------------------|
@@ -315,7 +337,8 @@ Todas las rutas (salvo `/api/auth/register` y `/api/auth/login`) requieren `Auth
 | Barberos         | `/api/barberos`                                 | Exclusivo admin                                                               |
 | Servicios        | `/api/servicios`                                | Exclusivo admin                                                               |
 | Horarios         | `/api/horarios` (+ `/semana-actual`, `/semana`) | Exclusivo admin                                                               |
-| Reservas         | `/api/reservas` (+ `/horas-disponibles`)        | Exclusivo admin (el barbero actúa vía `/api/agenda`)                          |
+| Reservas         | `/api/reservas` (+ `/horas-disponibles`, `PATCH /:id/cancelar`) | Exclusivo admin (el barbero actúa vía `/api/agenda`)          |
+| Portal público   | `/api/publico` — `servicios`, `barberos`, `horas-disponibles`, `dias-disponibles`, `POST reservas`, `POST reservas/consultar`, `POST reservas/cancelar` | Sin sesión; solo datos públicos y con límite de solicitudes por IP |
 | Agenda           | `/api/agenda?fecha=`                            | Ambos roles (el barbero, auto-filtrado)                                       |
 | Dashboard        | `/api/dashboard`                                | Ambos roles (respuesta distinta según el rol)                                 |
 
@@ -339,7 +362,7 @@ Authorization: Bearer <token>
 - **Barbero** — nombre, especialidad, telefono, correo (único), estado (Activo/Inactivo)
 - **Servicio** — nombre, descripcion, duracion (min), precio, estado (Activo/Inactivo)
 - **Horario** — barberoId (FK), fecha (turno de un día específico, no recurrente), semana, horaInicio, horaFin, estado (Activo/Descanso)
-- **Reserva** — clienteId (FK), barberoId (FK), servicioId (FK), fecha, hora, duracion (copiada del servicio al crearla), estado (**Pendiente / En proceso / Finalizada** — sin "Cancelada"), observaciones
+- **Reserva** — clienteId (FK), barberoId (FK), servicioId (FK), fecha, hora, duracion (copiada del servicio al crearla), estado (**Pendiente / En proceso / Finalizada / Cancelada**), observaciones, **codigo** (público, único), **origen** (`admin`/`web`), **canceladaEn**
 
 Relaciones: un Cliente, un Barbero y un Servicio pueden tener muchas Reservas; un Barbero puede tener muchos Horarios y, opcionalmente, un Usuario de acceso asociado.
 

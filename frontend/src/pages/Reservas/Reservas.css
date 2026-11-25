@@ -15,7 +15,7 @@
 }
 
 .reservas-header p{
-    color: #6b7280;
+    color: var(--text-muted);
 }
 
 .reservas-toolbar{
@@ -27,18 +27,18 @@
 .search-input{
     width: 320px;
     padding: 12px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--border-input);
     border-radius: 10px;
     outline: none;
     font-size: 15px;
 }
 
 .search-input:focus{
-    border-color: #3366FF;
+    border-color: var(--brand-500);
 }
 
 .btn-primary{
-    background: #3366FF;
+    background: var(--brand-500);
     color: white;
     border: none;
     padding: 12px 20px;
@@ -48,7 +48,7 @@
 }
 
 .btn-primary:hover{
-    background: #2952cc;
+    background: var(--brand-600);
 }
 /* Estados visuales consistentes en todo el sistema (especificación 10.10) */
 .estado-badge {
@@ -70,8 +70,8 @@
 }
 
 .estado-finalizada {
-    background: #e5e7eb;
-    color: #374151;
+    background: var(--border);
+    color: var(--text-strong);
 }
 
 @media (max-width: 768px) {
@@ -88,4 +88,36 @@
     .search-input {
         width: 100%;
     }
+}
+
+/* --- Barber Reserve 2.0 --- */
+.reservas-toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    align-items:flex-end;
+    justify-content:flex-start;
+}
+.reservas-toolbar .filtro-crece{ flex:1 1 260px; max-width:460px; }
+.reservas-toolbar .search-input{ width:100%; }
+.reserva-codigo{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    font-family:ui-monospace,"Cascadia Code","Consolas",monospace;
+    font-size:.85rem;
+    color:var(--text-strong);
+}
+.reserva-origen-web{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    width:max-content;
+    font-family:var(--font);
+    font-size:.72rem;
+    font-weight:600;
+    color:var(--brand-700);
+    background:var(--brand-50);
+    border-radius:999px;
+    padding:2px 8px;
 }

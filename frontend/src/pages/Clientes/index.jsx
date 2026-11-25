@@ -295,7 +295,8 @@ export default function Clientes() {
 
             <input
 
-              type="text"
+              type="search"
+              aria-label="Buscar clientes por nombre o teléfono"
 
               placeholder="Buscar por nombre o teléfono..."
 
@@ -313,6 +314,8 @@ export default function Clientes() {
 
 
           <DataTable
+
+            caption="Clientes registrados"
 
             columns={columnas}
 

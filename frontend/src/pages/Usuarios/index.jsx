@@ -45,7 +45,7 @@ export default function Usuarios() {
             key: "activo",
             label: "Estado",
             render: (row) => (
-                <span className={`estado-badge ${row.activo ? "estado-en-proceso" : "estado-finalizada"}`}>
+                <span className={`estado-badge ${row.activo ? "estado-activo" : "estado-inactivo"}`}>
                     {row.activo ? "Activo" : "Inactivo"}
                 </span>
             ),
@@ -54,8 +54,13 @@ export default function Usuarios() {
             key: "restablecer",
             label: "Contraseña",
             render: (row) => (
-                <button className="btn-secondary" onClick={() => solicitarRestablecerPassword(row)}>
-                    <FaKey /> Restablecer
+                <button
+                    type="button"
+                    className="btn-secondary btn-compacto"
+                    onClick={() => solicitarRestablecerPassword(row)}
+                    aria-label={`Restablecer contraseña de ${row.nombre}`}
+                >
+                    <FaKey aria-hidden="true" /> Restablecer
                 </button>
             ),
         },
@@ -151,6 +156,7 @@ export default function Usuarios() {
                     </div>
 
                     <DataTable
+                        caption="Cuentas de usuario del sistema"
                         columns={columnas}
                         data={listaUsuarios}
                         showActions={true}

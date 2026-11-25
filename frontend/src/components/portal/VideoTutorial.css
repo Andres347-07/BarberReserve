@@ -1,0 +1,10 @@
+.video-layout{ display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1.4fr); gap:32px; align-items:center; }
+.video-texto p{ color:var(--text-muted); margin-bottom:12px; }
+.video-nota{ display:flex; align-items:center; gap:8px; font-weight:600; color:var(--brand-700) !important; }
+.video-figura{ margin:0; }
+.video-tutorial{ width:100%; border-radius:var(--radius-lg); background:#000; box-shadow:var(--shadow); aspect-ratio:16 / 9; }
+.video-tutorial::cue{ font-size:1.05rem; background:rgba(0,0,0,.82); color:#fff; }
+.video-transcripcion{ margin-top:12px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:10px 14px; }
+.video-transcripcion summary{ cursor:pointer; font-weight:600; min-height:36px; display:flex; align-items:center; }
+.video-transcripcion ol{ margin:8px 0 4px 20px; display:flex; flex-direction:column; gap:6px; color:var(--text); }
+@media (max-width:860px){ .video-layout{ grid-template-columns:1fr; } }

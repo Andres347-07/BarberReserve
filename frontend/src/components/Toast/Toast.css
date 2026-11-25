@@ -127,3 +127,24 @@
     color:#1e40af;
 
 }
+
+/* --- Barber Reserve 2.0 --- */
+.toast{
+    border:1px solid currentColor;
+    border-left-width:5px;
+    max-width:calc(100vw - 32px);
+}
+.toast-content button{
+    color:inherit;
+    width:36px;
+    height:36px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:8px;
+    font-size:18px;
+}
+.toast-content button:hover{ background:rgba(0,0,0,.06); }
+@media (max-width: 560px){
+    .toast{ left:16px; right:16px; top:16px; min-width:0; }
+}

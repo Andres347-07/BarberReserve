@@ -35,11 +35,12 @@
 }
 
 .logo{
-    width:200px;
+    width:120px;
     margin-bottom:20px;
 }
 
-.overlay h1{
+.overlay h1,
+.login-marca{
 
     font-size:60px;
     font-weight:700;
@@ -47,7 +48,8 @@
 
 }
 
-.overlay h1 span{
+.overlay h1 span,
+.login-marca span{
 
     color:#3366ff;
 
@@ -137,6 +139,7 @@
 
 }
 
+.card h1,
 .card h2{
 
     text-align:center;
@@ -336,6 +339,7 @@ padding:30px;
 
 }
 
+.card h1,
 .card h2{
 
 font-size:26px;
@@ -343,3 +347,27 @@ font-size:26px;
 }
 
 }
+/* --- Barber Reserve 2.0 --- */
+.login-right{ flex-direction:column; gap:16px; position:relative; }
+.login-volver{
+    align-self:center;
+    display:inline-flex; align-items:center; gap:8px;
+    min-height:44px; padding:8px 14px;
+    color:var(--brand-600); font-weight:600; border-radius:10px;
+}
+.login-volver:hover{ background:var(--brand-50); }
+.card h1{ font-size:1.6rem; }
+.card p{ color:var(--text-muted); }
+.card input{ border:1px solid var(--border-input) !important; }
+.card button:disabled{ opacity:.7; cursor:wait; }
+.login-error{
+    color:var(--danger-700) !important;
+    background:var(--danger-50);
+    border:1px solid #FCA5A5;
+    border-radius:10px;
+    padding:10px 14px;
+    margin:8px 0 4px;
+    font-weight:500;
+}
+.login-cliente{ margin-top:18px; text-align:center; font-size:.95rem; }
+.login-cliente a{ color:var(--brand-600); font-weight:600; text-decoration:underline; text-underline-offset:3px; }

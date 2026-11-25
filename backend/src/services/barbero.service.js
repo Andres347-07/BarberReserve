@@ -6,6 +6,7 @@ const Barbero = require("../models/Barbero");
 const Usuario = require("../models/Usuario");
 const Horario = require("../models/Horario");
 const Reserva = require("../models/Reserva");
+const Servicio = require("../models/Servicio");
 const generarPasswordTemporal = require("../utils/generarPassword");
 const { validarNombre, validarTelefono, validarCorreo } = require("../utils/validarContacto");
 
@@ -16,6 +17,7 @@ class BarberoService {
     async obtenerTodos() {
 
         return await Barbero.findAll({
+            include: [{ model: Servicio, as: "servicios", attributes: ["id", "nombre"], through: { attributes: [] } }],
             order: [["id", "ASC"]],
         });
 
@@ -24,8 +26,25 @@ class BarberoService {
 
     async obtenerPorId(id) {
 
-        return await Barbero.findByPk(id);
+        return await Barbero.findByPk(id, {
+            include: [{ model: Servicio, as: "servicios", attributes: ["id", "nombre"], through: { attributes: [] } }],
+        });
 
+    }
+
+    /**
+     * Servicios que realiza el barbero (2.1). Lista vacía = realiza todos.
+     * Solo se aceptan servicios existentes.
+     */
+    async _asignarServicios(barbero, servicios, transaction) {
+        if (servicios === undefined) return;
+        if (!Array.isArray(servicios)) throw new Error("Los servicios deben enviarse como una lista.");
+        const ids = [...new Set(servicios.map(Number).filter(Number.isInteger))];
+        if (ids.length > 0) {
+            const existentes = await Servicio.count({ where: { id: { [Op.in]: ids } }, transaction });
+            if (existentes !== ids.length) throw new Error("Uno de los servicios seleccionados no existe.");
+        }
+        await barbero.setServicios(ids, { transaction });
     }
 
 
@@ -87,6 +106,8 @@ class BarberoService {
                 },
                 { transaction: t }
             );
+
+            await this._asignarServicios(barbero, datos.servicios, t);
 
             return barbero;
         });
@@ -184,6 +205,8 @@ class BarberoService {
                 await usuario.update({ email: datos.correo, nombre: barbero.nombre });
             }
         }
+
+        await this._asignarServicios(barbero, datos.servicios);
 
         // Si el barbero pasa a Inactivo, su usuario se desactiva para que
         // no pueda iniciar sesión (ver especificación, capítulo 6.8/13.4).

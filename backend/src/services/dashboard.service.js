@@ -2,9 +2,12 @@ const Reserva = require("../models/Reserva");
 const Cliente = require("../models/Cliente");
 const Barbero = require("../models/Barbero");
 const Servicio = require("../models/Servicio");
+const { hoyEnZona } = require("../utils/fechaHora");
 
+// Fecha de hoy en la zona horaria de la barbería (antes se usaba UTC, lo que
+// en Colombia adelantaba el día a partir de las 7:00 p. m.).
 function hoyISO() {
-    return new Date().toISOString().slice(0, 10);
+    return hoyEnZona();
 }
 
 
@@ -15,6 +18,8 @@ function mensajeActividad(tipo, registro) {
         case "servicio": return `Servicio creado: ${registro.nombre}`;
         case "reserva_creada": return `Reserva creada para ${registro.fecha} a las ${registro.hora?.slice(0, 5)}`;
         case "reserva_finalizada": return `Reserva finalizada (${registro.fecha} ${registro.hora?.slice(0, 5)})`;
+        case "reserva_cancelada": return `Reserva cancelada (${registro.fecha} ${registro.hora?.slice(0, 5)})`;
+        case "reserva_web": return `Reserva en línea para ${registro.fecha} a las ${registro.hora?.slice(0, 5)}`;
         default: return "";
     }
 }
@@ -46,14 +51,17 @@ class DashboardService {
             }),
         ]);
 
-        const porEstado = { Pendiente: 0, "En proceso": 0, Finalizada: 0 };
+        const porEstado = { Pendiente: 0, "En espera": 0, "En proceso": 0, Finalizada: 0, Cancelada: 0, "No asistió": 0 };
         const porServicio = {};
         const porBarbero = {};
         let reservasHoy = 0;
+        let reservasWeb = 0;
 
         for (const r of reservas) {
             porEstado[r.estado] = (porEstado[r.estado] || 0) + 1;
+            if (r.estado === "Cancelada" || r.estado === "No asistió") continue;
             if (r.fecha === hoy) reservasHoy += 1;
+            if (r.origen === "web") reservasWeb += 1;
 
             const nombreServicio = r.servicio?.nombre || "Sin servicio";
             porServicio[nombreServicio] = (porServicio[nombreServicio] || 0) + 1;
@@ -75,6 +83,8 @@ class DashboardService {
             reservasPendientes: porEstado["Pendiente"],
             reservasEnProceso: porEstado["En proceso"],
             reservasFinalizadas: porEstado["Finalizada"],
+            reservasCanceladas: porEstado["Cancelada"],
+            reservasWeb,
             reservasPorEstado: porEstado,
             reservasPorServicio: porServicio,
             reservasPorBarbero: porBarbero,
@@ -94,11 +104,12 @@ class DashboardService {
             ...clientes.map((c) => ({ tipo: "cliente", fecha: c.createdAt, mensaje: mensajeActividad("cliente", c) })),
             ...barberos.map((b) => ({ tipo: "barbero", fecha: b.createdAt, mensaje: mensajeActividad("barbero", b) })),
             ...servicios.map((s) => ({ tipo: "servicio", fecha: s.createdAt, mensaje: mensajeActividad("servicio", s) })),
-            ...reservas.map((r) => ({
-                tipo: r.estado === "Finalizada" ? "reserva_finalizada" : "reserva_creada",
-                fecha: r.updatedAt,
-                mensaje: mensajeActividad(r.estado === "Finalizada" ? "reserva_finalizada" : "reserva_creada", r),
-            })),
+            ...reservas.map((r) => {
+                let tipo = r.origen === "web" ? "reserva_web" : "reserva_creada";
+                if (r.estado === "Finalizada") tipo = "reserva_finalizada";
+                if (r.estado === "Cancelada") tipo = "reserva_cancelada";
+                return { tipo, fecha: r.updatedAt, mensaje: mensajeActividad(tipo, r) };
+            }),
         ];
 
         return eventos
@@ -119,12 +130,13 @@ class DashboardService {
             order: [["fecha", "ASC"], ["hora", "ASC"]],
         });
 
-        const porEstado = { Pendiente: 0, "En proceso": 0, Finalizada: 0 };
+        const porEstado = { Pendiente: 0, "En espera": 0, "En proceso": 0, Finalizada: 0, Cancelada: 0, "No asistió": 0 };
         let reservasHoy = 0;
         let proximaCita = null;
 
         for (const r of reservas) {
             porEstado[r.estado] = (porEstado[r.estado] || 0) + 1;
+            if (r.estado === "Cancelada" || r.estado === "No asistió") continue;
             if (r.fecha === hoy) reservasHoy += 1;
 
             if (!proximaCita && r.fecha >= hoy && r.estado !== "Finalizada") {
@@ -143,6 +155,7 @@ class DashboardService {
             reservasPendientes: porEstado["Pendiente"],
             reservasEnProceso: porEstado["En proceso"],
             reservasFinalizadas: porEstado["Finalizada"],
+            reservasCanceladas: porEstado["Cancelada"],
             reservasPorEstado: porEstado,
             proximaCita,
         };

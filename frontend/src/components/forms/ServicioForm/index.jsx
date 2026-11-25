@@ -1,3 +1,4 @@
+import enfocarPrimerError from "../../../utils/enfocarPrimerError";
 import { useState } from "react";
 
 import "./ServicioForm.css";
@@ -141,6 +142,8 @@ export default function ServicioForm({
 
         if (!validarFormulario()) {
 
+            enfocarPrimerError(e.currentTarget);
+
             return;
 
         }
@@ -162,6 +165,7 @@ export default function ServicioForm({
             <form
                 className="servicio-form"
                 onSubmit={handleSubmit}
+                noValidate
             >
 
 
@@ -188,12 +192,13 @@ export default function ServicioForm({
                 <div className="form-group">
 
 
-                    <label>
-                        Nombre
-                    </label>
+                    <label htmlFor="campo-nombre">Nombre</label>
 
 
                     <input
+                        id="campo-nombre"
+                        aria-invalid={!!errores.nombre}
+                        aria-describedby={errores.nombre ? "error-nombre" : undefined}
                         type="text"
                         name="nombre"
                         value={formulario.nombre}
@@ -203,8 +208,7 @@ export default function ServicioForm({
 
 
                     {errores.nombre && (
-
-                        <span className="error-text">
+                        <span className="error-text" id="error-nombre">
                             {errores.nombre}
                         </span>
 
@@ -221,12 +225,13 @@ export default function ServicioForm({
                 <div className="form-group">
 
 
-                    <label>
-                        Descripción
-                    </label>
+                    <label htmlFor="campo-descripcion">Descripción</label>
 
 
                     <input
+                        id="campo-descripcion"
+                        aria-invalid={!!errores.descripcion}
+                        aria-describedby={errores.descripcion ? "error-descripcion" : undefined}
                         type="text"
                         name="descripcion"
                         value={formulario.descripcion}
@@ -236,8 +241,7 @@ export default function ServicioForm({
 
 
                     {errores.descripcion && (
-
-                        <span className="error-text">
+                        <span className="error-text" id="error-descripcion">
                             {errores.descripcion}
                         </span>
 
@@ -254,12 +258,13 @@ export default function ServicioForm({
                 <div className="form-group">
 
 
-                    <label>
-                        Duración (minutos)
-                    </label>
+                    <label htmlFor="campo-duracion">Duración (minutos)</label>
 
 
                     <input
+                        id="campo-duracion"
+                        aria-invalid={!!errores.duracion}
+                        aria-describedby={errores.duracion ? "error-duracion" : undefined}
                         type="number"
                         name="duracion"
                         value={formulario.duracion}
@@ -269,8 +274,7 @@ export default function ServicioForm({
 
 
                     {errores.duracion && (
-
-                        <span className="error-text">
+                        <span className="error-text" id="error-duracion">
                             {errores.duracion}
                         </span>
 
@@ -287,12 +291,13 @@ export default function ServicioForm({
                 <div className="form-group">
 
 
-                    <label>
-                        Precio
-                    </label>
+                    <label htmlFor="campo-precio">Precio</label>
 
 
                     <input
+                        id="campo-precio"
+                        aria-invalid={!!errores.precio}
+                        aria-describedby={errores.precio ? "error-precio" : undefined}
                         type="number"
                         name="precio"
                         value={formulario.precio}
@@ -302,8 +307,7 @@ export default function ServicioForm({
 
 
                     {errores.precio && (
-
-                        <span className="error-text">
+                        <span className="error-text" id="error-precio">
                             {errores.precio}
                         </span>
 
@@ -320,12 +324,11 @@ export default function ServicioForm({
                 <div className="form-group">
 
 
-                    <label>
-                        Estado
-                    </label>
+                    <label htmlFor="campo-estado">Estado</label>
 
 
                     <select
+                        id="campo-estado"
                         name="estado"
                         value={formulario.estado}
                         onChange={handleChange}

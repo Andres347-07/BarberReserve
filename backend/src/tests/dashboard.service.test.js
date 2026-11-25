@@ -4,8 +4,11 @@ const dashboardService = require("../services/dashboard.service");
 const horarioService = require("../services/horario.service");
 const reservaService = require("../services/reserva.service");
 
+// El dashboard calcula "hoy" en la zona horaria de la barbería
+// (APP_TIMEZONE, por defecto America/Bogota), no en UTC.
+const { hoyEnZona } = require("../utils/fechaHora");
 function hoyISO() {
-    return new Date().toISOString().slice(0, 10);
+    return hoyEnZona();
 }
 
 describe("dashboard.service — resumen del administrador y del barbero", () => {
@@ -60,6 +63,11 @@ describe("dashboard.service — resumen del administrador y del barbero", () => 
             estado: "Activo",
         });
 
+        // La regla "no reservar en el pasado" rechazaría las 09:00 de hoy si la
+        // prueba corre después de esa hora; se fija el reloj al inicio del día.
+        const relojOriginal = reservaService.reloj;
+        reservaService.reloj = () => ({ fecha: hoyISO(), minutos: 0 });
+
         await reservaService.crear({
             clienteId: cliente.id,
             barberoId: barberoActivo.id,
@@ -67,6 +75,8 @@ describe("dashboard.service — resumen del administrador y del barbero", () => 
             fecha: hoyISO(),
             hora: "09:00",
         });
+
+        reservaService.reloj = relojOriginal;
     });
 
     afterAll(async () => {

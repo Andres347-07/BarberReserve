@@ -63,7 +63,7 @@ describe("barbero.service — creación automática de usuario y reglas de elimi
 
         await horarioService.crear({
             barberoId: barbero.id,
-            fecha: "2026-08-10",
+            fecha: "2099-08-10",
             horaInicio: "08:00",
             horaFin: "14:00",
             estado: "Activo",
@@ -111,7 +111,7 @@ describe("barbero.service — creación automática de usuario y reglas de elimi
 
         await horarioService.crear({
             barberoId: barbero.id,
-            fecha: "2026-08-11",
+            fecha: "2099-08-11",
             horaInicio: "08:00",
             horaFin: "14:00",
             estado: "Activo",
@@ -121,7 +121,7 @@ describe("barbero.service — creación automática de usuario y reglas de elimi
             clienteId: cliente.id,
             barberoId: barbero.id,
             servicioId: servicio.id,
-            fecha: "2026-08-11",
+            fecha: "2099-08-11",
             hora: "09:00",
         });
 

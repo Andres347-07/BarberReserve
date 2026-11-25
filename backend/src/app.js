@@ -11,14 +11,31 @@ const horarioRoutes = require("./routes/horario.routes");
 const reservaRoutes = require("./routes/reserva.routes");
 const agendaRoutes = require("./routes/agenda.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
+const publicoRoutes = require("./routes/publico.routes");
+const configuracionRoutes = require("./routes/configuracion.routes");
+const notificacionRoutes = require("./routes/notificacion.routes");
 
 const { noEncontrado, manejadorErrores } = require("./middlewares/error.middleware");
 
 const app = express();
 
-// Middlewares
-app.use(cors());
-app.use(express.json());
+// Detrás del proxy de Render (u otro hosting) req.ip debe ser la IP real del
+// cliente; de lo contrario el limitador de solicitudes contaría a todos juntos.
+if (process.env.TRUST_PROXY) {
+    const valor = process.env.TRUST_PROXY;
+    app.set("trust proxy", /^\d+$/.test(valor) ? Number(valor) : valor === "true");
+}
+
+// CORS: en producción solo se aceptan los dominios de CORS_ORIGIN
+// (separados por coma). Sin la variable se acepta cualquier origen (desarrollo).
+const origenes = (process.env.CORS_ORIGIN || "")
+    .split(",")
+    .map((o) => o.trim().replace(/\/$/, ""))
+    .filter(Boolean)
+    // Render entrega solo el dominio cuando el valor viene de otro servicio
+    .map((o) => (/^https?:\/\//i.test(o) ? o : `https://${o}`));
+app.use(cors(origenes.length ? { origin: origenes } : undefined));
+app.use(express.json({ limit: "100kb" }));
 app.use(express.urlencoded({ extended: true }));
 
 // Ruta de prueba
@@ -27,6 +44,16 @@ app.get("/", (req, res) => {
         success: true,
         message: "🚀 BarberReserve API funcionando correctamente"
     });
+});
+
+// Ruta de salud para el hosting (verifica también la base de datos)
+app.get("/api/salud", async (req, res) => {
+    try {
+        await require("./database/connection").authenticate();
+        res.json({ success: true, estado: "ok" });
+    } catch {
+        res.status(503).json({ success: false, estado: "sin base de datos" });
+    }
 });
 
 // Rutas
@@ -38,6 +65,9 @@ app.use("/api/horarios", horarioRoutes);
 app.use("/api/reservas", reservaRoutes);
 app.use("/api/agenda", agendaRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/publico", publicoRoutes);
+app.use("/api/configuracion", configuracionRoutes);
+app.use("/api/notificaciones", notificacionRoutes);
 
 
 app.use(noEncontrado);

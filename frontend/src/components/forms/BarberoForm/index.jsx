@@ -1,4 +1,6 @@
-import { useState } from "react";
+import enfocarPrimerError from "../../../utils/enfocarPrimerError";
+import { useEffect, useState } from "react";
+import servicioService from "../../../services/servicioService";
 
 import "./BarberoForm.css";
 
@@ -14,9 +16,28 @@ export default function BarberoForm({
         especialidad: barbero?.especialidad || "",
         telefono: barbero?.telefono || "",
         correo: barbero?.correo || "",
-        estado: barbero?.estado || "Activo"
+        estado: barbero?.estado || "Activo",
+        // Servicios que realiza (vacío = todos).
+        servicios: (barbero?.servicios || []).map((s) => s.id)
 
     });
+
+    const [catalogo, setCatalogo] = useState([]);
+
+    useEffect(() => {
+        servicioService.obtenerServicios()
+            .then((lista) => setCatalogo(lista.filter((s) => s.estado === "Activo")))
+            .catch(() => setCatalogo([]));
+    }, []);
+
+    const alternarServicio = (id) => {
+        setFormulario((prev) => ({
+            ...prev,
+            servicios: prev.servicios.includes(id)
+                ? prev.servicios.filter((x) => x !== id)
+                : [...prev.servicios, id],
+        }));
+    };
 
 
     const [errores, setErrores] = useState({});
@@ -141,6 +162,8 @@ export default function BarberoForm({
 
         if (!validarFormulario()) {
 
+            enfocarPrimerError(e.currentTarget);
+
             return;
 
         }
@@ -161,6 +184,7 @@ export default function BarberoForm({
             <form
                 className="barbero-form"
                 onSubmit={handleSubmit}
+                noValidate
             >
 
 
@@ -184,12 +208,13 @@ export default function BarberoForm({
                 <div className="form-group">
 
 
-                    <label>
-                        Nombre completo
-                    </label>
+                    <label htmlFor="campo-nombre">Nombre completo</label>
 
 
                     <input
+                        id="campo-nombre"
+                        aria-invalid={!!errores.nombre}
+                        aria-describedby={errores.nombre ? "error-nombre" : undefined}
                         type="text"
                         name="nombre"
                         value={formulario.nombre}
@@ -199,8 +224,7 @@ export default function BarberoForm({
 
 
                     {errores.nombre && (
-
-                        <span className="error-text">
+                        <span className="error-text" id="error-nombre">
                             {errores.nombre}
                         </span>
 
@@ -216,12 +240,13 @@ export default function BarberoForm({
                 <div className="form-group">
 
 
-                    <label>
-                        Especialidad
-                    </label>
+                    <label htmlFor="campo-especialidad">Especialidad</label>
 
 
                     <input
+                        id="campo-especialidad"
+                        aria-invalid={!!errores.especialidad}
+                        aria-describedby={errores.especialidad ? "error-especialidad" : undefined}
                         type="text"
                         name="especialidad"
                         value={formulario.especialidad}
@@ -231,8 +256,7 @@ export default function BarberoForm({
 
 
                     {errores.especialidad && (
-
-                        <span className="error-text">
+                        <span className="error-text" id="error-especialidad">
                             {errores.especialidad}
                         </span>
 
@@ -248,12 +272,13 @@ export default function BarberoForm({
                 <div className="form-group">
 
 
-                    <label>
-                        Teléfono
-                    </label>
+                    <label htmlFor="campo-telefono">Teléfono</label>
 
 
                     <input
+                        id="campo-telefono"
+                        aria-invalid={!!errores.telefono}
+                        aria-describedby={errores.telefono ? "error-telefono" : undefined}
                         type="text"
                         name="telefono"
                         value={formulario.telefono}
@@ -263,8 +288,7 @@ export default function BarberoForm({
 
 
                     {errores.telefono && (
-
-                        <span className="error-text">
+                        <span className="error-text" id="error-telefono">
                             {errores.telefono}
                         </span>
 
@@ -280,12 +304,13 @@ export default function BarberoForm({
                 <div className="form-group">
 
 
-                    <label>
-                        Correo electrónico
-                    </label>
+                    <label htmlFor="campo-correo">Correo electrónico</label>
 
 
                     <input
+                        id="campo-correo"
+                        aria-invalid={!!errores.correo}
+                        aria-describedby={errores.correo ? "error-correo" : undefined}
                         type="email"
                         name="correo"
                         value={formulario.correo}
@@ -295,8 +320,7 @@ export default function BarberoForm({
 
 
                     {errores.correo && (
-
-                        <span className="error-text">
+                        <span className="error-text" id="error-correo">
                             {errores.correo}
                         </span>
 
@@ -312,12 +336,11 @@ export default function BarberoForm({
                 <div className="form-group">
 
 
-                    <label>
-                        Estado
-                    </label>
+                    <label htmlFor="campo-estado">Estado</label>
 
 
                     <select
+                        id="campo-estado"
                         name="estado"
                         value={formulario.estado}
                         onChange={handleChange}
@@ -340,6 +363,27 @@ export default function BarberoForm({
 
 
 
+
+                <fieldset className="servicios-fieldset">
+                    <legend>Servicios que realiza</legend>
+                    <p className="campo-ayuda" id="ayuda-servicios">
+                        Si no marca ninguno, el barbero aparecerá disponible para todos los servicios.
+                    </p>
+                    {catalogo.length === 0 && <p className="campo-ayuda">No hay servicios activos.</p>}
+                    <div className="servicios-opciones">
+                        {catalogo.map((s) => (
+                            <label key={s.id} className="servicio-check">
+                                <input
+                                    type="checkbox"
+                                    checked={formulario.servicios.includes(s.id)}
+                                    onChange={() => alternarServicio(s.id)}
+                                    aria-describedby="ayuda-servicios"
+                                />
+                                <span>{s.nombre}</span>
+                            </label>
+                        ))}
+                    </div>
+                </fieldset>
 
                 <div className="form-buttons">
 

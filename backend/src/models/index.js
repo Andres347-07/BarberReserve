@@ -4,6 +4,10 @@ const Servicio = require("./Servicio");
 const Horario = require("./Horario");
 const Reserva = require("./Reserva");
 const Usuario = require("./Usuario");
+const PlantillaHorario = require("./PlantillaHorario");
+const Bloqueo = require("./Bloqueo");
+const Notificacion = require("./Notificacion");
+const Configuracion = require("./Configuracion");
 
 
 /*
@@ -81,6 +85,21 @@ Usuario.belongsTo(Barbero, {
 });
 
 
+/* Barbero -> Plantilla semanal y bloqueos */
+Barbero.hasMany(PlantillaHorario, { foreignKey: "barberoId", as: "plantilla" });
+PlantillaHorario.belongsTo(Barbero, { foreignKey: "barberoId", as: "barbero" });
+Barbero.hasMany(Bloqueo, { foreignKey: "barberoId", as: "bloqueos" });
+Bloqueo.belongsTo(Barbero, { foreignKey: "barberoId", as: "barbero" });
+
+/* Barbero <-> Servicio: qué servicios realiza cada barbero */
+Barbero.belongsToMany(Servicio, { through: "barbero_servicios", foreignKey: "barberoId", otherKey: "servicioId", as: "servicios" });
+Servicio.belongsToMany(Barbero, { through: "barbero_servicios", foreignKey: "servicioId", otherKey: "barberoId", as: "barberos" });
+
+/* Usuario -> Notificación */
+Usuario.hasMany(Notificacion, { foreignKey: "usuarioId", as: "notificaciones" });
+Notificacion.belongsTo(Usuario, { foreignKey: "usuarioId", as: "usuario" });
+Notificacion.belongsTo(Reserva, { foreignKey: "reservaId", as: "reserva", constraints: false });
+
 module.exports = {
     Cliente,
     Barbero,
@@ -88,4 +107,8 @@ module.exports = {
     Horario,
     Reserva,
     Usuario,
+    PlantillaHorario,
+    Bloqueo,
+    Notificacion,
+    Configuracion,
 };

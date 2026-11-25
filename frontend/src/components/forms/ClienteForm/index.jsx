@@ -1,3 +1,4 @@
+import enfocarPrimerError from "../../../utils/enfocarPrimerError";
 import { useState } from "react";
 
 import "./ClienteForm.css";
@@ -83,6 +84,8 @@ export default function ClienteForm({
 
         if (!validarFormulario()) {
 
+            enfocarPrimerError(e.currentTarget);
+
             return;
 
         }
@@ -98,6 +101,7 @@ export default function ClienteForm({
             <form
                 className="cliente-form"
                 onSubmit={handleSubmit}
+                noValidate
             >
 
                 <h2>
@@ -112,11 +116,12 @@ export default function ClienteForm({
 
                 <div className="form-group">
 
-                    <label>
-                        Nombre completo
-                    </label>
+                    <label htmlFor="campo-nombre">Nombre completo</label>
 
                     <input
+                        id="campo-nombre"
+                        aria-invalid={!!errores.nombre}
+                        aria-describedby={errores.nombre ? "error-nombre" : undefined}
                         type="text"
                         name="nombre"
                         value={formulario.nombre}
@@ -125,7 +130,7 @@ export default function ClienteForm({
                     />
 
                     {errores.nombre && (
-                        <span className="error-text">
+                        <span className="error-text" id="error-nombre">
                             {errores.nombre}
                         </span>
                     )}
@@ -134,11 +139,12 @@ export default function ClienteForm({
 
                 <div className="form-group">
 
-                    <label>
-                        Teléfono
-                    </label>
+                    <label htmlFor="campo-telefono">Teléfono</label>
 
                     <input
+                        id="campo-telefono"
+                        aria-invalid={!!errores.telefono}
+                        aria-describedby={errores.telefono ? "error-telefono" : undefined}
                         type="text"
                         name="telefono"
                         value={formulario.telefono}
@@ -147,7 +153,7 @@ export default function ClienteForm({
                     />
 
                     {errores.telefono && (
-                        <span className="error-text">
+                        <span className="error-text" id="error-telefono">
                             {errores.telefono}
                         </span>
                     )}
@@ -156,11 +162,12 @@ export default function ClienteForm({
 
                 <div className="form-group">
 
-                    <label>
-                        Correo electrónico
-                    </label>
+                    <label htmlFor="campo-correo">Correo electrónico</label>
 
                     <input
+                        id="campo-correo"
+                        aria-invalid={!!errores.correo}
+                        aria-describedby={errores.correo ? "error-correo" : undefined}
                         type="email"
                         name="correo"
                         value={formulario.correo}
@@ -169,7 +176,7 @@ export default function ClienteForm({
                     />
 
                     {errores.correo && (
-                        <span className="error-text">
+                        <span className="error-text" id="error-correo">
                             {errores.correo}
                         </span>
                     )}

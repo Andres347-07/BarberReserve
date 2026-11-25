@@ -1,55 +1,68 @@
 import { useState } from "react";
-import { FaKey } from "react-icons/fa";
+import { FaKey, FaBars, FaUserCircle } from "react-icons/fa";
 
 import { useAuth } from "../../contexts/useAuth";
 import CambiarPasswordForm from "../forms/CambiarPasswordForm";
 import useToast from "../../hooks/useToast";
 import Toast from "../Toast";
+import Notificaciones from "./Notificaciones";
+import PreferenciasBoton from "../preferencias/PreferenciasBoton";
 
-export default function Navbar() {
+import "./Navbar.css";
+
+function fechaLegible() {
+  return new Date().toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long" });
+}
+
+export default function Navbar({ menuAbierto = false, onAlternarMenu }) {
   const { usuario } = useAuth();
   const [mostrarCambiarPassword, setMostrarCambiarPassword] = useState(false);
   const { toast, mostrarToast, cerrarToast } = useToast();
 
   return (
-    <header
-      style={{
-        height: 80,
-        background: "white",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "0 30px",
-        boxShadow: "0 2px 8px rgba(0,0,0,.05)",
-      }}
-    >
+    <header className="navbar">
       <Toast mensaje={toast.mensaje} tipo={toast.tipo} cerrar={cerrarToast} />
 
-      <h3>BarberReserve</h3>
-
-      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-
+      <div className="navbar-izquierda">
         <button
-          onClick={() => setMostrarCambiarPassword(true)}
-          title="Cambiar contraseña"
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            color: "#6b7280",
-            fontSize: 18,
-            display: "flex",
-            alignItems: "center",
-          }}
+          type="button"
+          className="navbar-menu-btn"
+          onClick={onAlternarMenu}
+          aria-label={menuAbierto ? "Cerrar menú" : "Abrir menú"}
+          aria-expanded={menuAbierto}
+          aria-controls="menu-principal"
         >
-          <FaKey />
+          <FaBars aria-hidden="true" />
         </button>
 
-        <div style={{ textAlign: "right" }}>
-          <div>{usuario?.nombre}</div>
-          <small style={{ color: "#6b7280", textTransform: "capitalize" }}>
-            {usuario?.rol}
-          </small>
+        <p className="navbar-fecha">{fechaLegible()}</p>
+      </div>
+
+      <div className="navbar-derecha">
+
+        <PreferenciasBoton />
+
+        <Notificaciones />
+
+        <button
+          type="button"
+          className="navbar-icon-btn"
+          onClick={() => setMostrarCambiarPassword(true)}
+          aria-label="Cambiar contraseña"
+          title="Cambiar contraseña"
+        >
+          <FaKey aria-hidden="true" />
+        </button>
+
+        <div className="navbar-usuario">
+          <FaUserCircle aria-hidden="true" className="navbar-avatar" />
+          <div>
+            <p className="navbar-nombre">{usuario?.nombre}</p>
+            <p className="navbar-rol">
+              <span className="sr-only">Rol: </span>
+              {usuario?.rol === "admin" ? "Administrador" : "Barbero"}
+            </p>
+          </div>
         </div>
 
       </div>

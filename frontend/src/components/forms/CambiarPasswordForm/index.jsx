@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import useDialogo from "../../../hooks/useDialogo";
 
 import "./CambiarPasswordForm.css";
 
@@ -13,6 +14,10 @@ export default function CambiarPasswordForm({ obligatorio = false, onExito, onCa
     });
 
     const [error, setError] = useState("");
+    const refDialogo = useRef(null);
+
+    // Como ventana modal: foco atrapado, Escape para cerrar y retorno del foco.
+    useDialogo(refDialogo, { activo: true, onCerrar: obligatorio ? undefined : onCancelar });
     const [enviando, setEnviando] = useState(false);
 
     const handleChange = (e) => {
@@ -57,9 +62,17 @@ export default function CambiarPasswordForm({ obligatorio = false, onExito, onCa
 
     return (
         <div className={obligatorio ? "cambiar-password-pantalla" : "cambiar-password-overlay"}>
-            <form className="cambiar-password-form" onSubmit={handleSubmit}>
+            <form
+                ref={refDialogo}
+                className="cambiar-password-form"
+                onSubmit={handleSubmit}
+                role="dialog"
+                aria-modal={obligatorio ? undefined : "true"}
+                aria-labelledby="titulo-cambiar-password"
+                noValidate
+            >
 
-                <h2>{obligatorio ? "Debe cambiar su contraseña" : "Cambiar contraseña"}</h2>
+                <h2 id="titulo-cambiar-password">{obligatorio ? "Debe cambiar su contraseña" : "Cambiar contraseña"}</h2>
 
                 <p>
                     {obligatorio
@@ -68,36 +81,47 @@ export default function CambiarPasswordForm({ obligatorio = false, onExito, onCa
                 </p>
 
                 <div className="form-group">
-                    <label>Contraseña actual</label>
+                    <label htmlFor="campo-passwordActual">Contraseña actual</label>
                     <input
+                        id="campo-passwordActual"
                         type="password"
                         name="passwordActual"
+                        autoComplete="current-password"
+                        aria-describedby={error ? "error-password" : undefined}
                         value={formulario.passwordActual}
                         onChange={handleChange}
                     />
                 </div>
 
                 <div className="form-group">
-                    <label>Nueva contraseña</label>
+                    <label htmlFor="campo-passwordNueva">Nueva contraseña</label>
                     <input
+                        id="campo-passwordNueva"
                         type="password"
                         name="passwordNueva"
+                        autoComplete="new-password"
+                        aria-describedby={error ? "error-password" : undefined}
                         value={formulario.passwordNueva}
                         onChange={handleChange}
                     />
                 </div>
 
                 <div className="form-group">
-                    <label>Confirmar nueva contraseña</label>
+                    <label htmlFor="campo-confirmarPassword">Confirmar nueva contraseña</label>
                     <input
+                        id="campo-confirmarPassword"
                         type="password"
                         name="confirmarPassword"
+                        autoComplete="new-password"
+                        aria-describedby={error ? "error-password" : undefined}
                         value={formulario.confirmarPassword}
                         onChange={handleChange}
                     />
                 </div>
 
-                {error && <span className="error-text">{error}</span>}
+                <div aria-live="assertive">
+                    {error && <span className="error-text" id="error-password" role="alert">{error}</span>}
+                </div>
 
                 <div className="form-buttons">
                     {!obligatorio && (

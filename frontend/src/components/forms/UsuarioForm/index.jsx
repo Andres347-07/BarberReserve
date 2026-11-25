@@ -1,3 +1,4 @@
+import enfocarPrimerError from "../../../utils/enfocarPrimerError";
 import { useEffect, useState } from "react";
 
 import "./UsuarioForm.css";
@@ -79,7 +80,10 @@ export default function UsuarioForm({
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!validar()) return;
+        if (!validar()) {
+            enfocarPrimerError(e.currentTarget);
+            return;
+        }
 
         if (esEdicion) {
             onSave({ nombre: formulario.nombre, email: formulario.email, activo: formulario.activo === "true" || formulario.activo === true });
@@ -96,7 +100,7 @@ export default function UsuarioForm({
 
     return (
         <div className="usuario-form-container">
-            <form className="usuario-form" onSubmit={handleSubmit}>
+            <form className="usuario-form" onSubmit={handleSubmit} noValidate>
 
                 <h2>{esEdicion ? "Editar Usuario" : "Nuevo Usuario"}</h2>
                 <p>
@@ -106,50 +110,68 @@ export default function UsuarioForm({
                 </p>
 
                 <div className="form-group">
-                    <label>Nombre completo</label>
-                    <input type="text" name="nombre" value={formulario.nombre} onChange={handleChange} />
-                    {errores.nombre && <span className="error-text">{errores.nombre}</span>}
+                    <label htmlFor="campo-nombre">Nombre completo</label>
+                    <input
+                        id="campo-nombre"
+                        aria-invalid={!!errores.nombre}
+                        aria-describedby={errores.nombre ? "error-nombre" : undefined} type="text" name="nombre" value={formulario.nombre} onChange={handleChange} />
+                    {errores.nombre && <span className="error-text" id="error-nombre">{errores.nombre}</span>}
                 </div>
 
                 <div className="form-group">
-                    <label>Correo electrónico</label>
-                    <input type="email" name="email" value={formulario.email} onChange={handleChange} />
-                    {errores.email && <span className="error-text">{errores.email}</span>}
+                    <label htmlFor="campo-email">Correo electrónico</label>
+                    <input
+                        id="campo-email"
+                        aria-invalid={!!errores.email}
+                        aria-describedby={errores.email ? "error-email" : undefined} type="email" name="email" value={formulario.email} onChange={handleChange} />
+                    {errores.email && <span className="error-text" id="error-email">{errores.email}</span>}
                 </div>
 
                 {!esEdicion && (
                     <>
                         <div className="form-group">
-                            <label>Contraseña</label>
-                            <input type="password" name="password" value={formulario.password} onChange={handleChange} />
-                            {errores.password && <span className="error-text">{errores.password}</span>}
+                            <label htmlFor="campo-password">Contraseña</label>
+                            <input
+                        id="campo-password"
+                        aria-invalid={!!errores.password}
+                        aria-describedby={errores.password ? "error-password" : undefined} type="password" name="password" value={formulario.password} onChange={handleChange} />
+                            {errores.password && <span className="error-text" id="error-password">{errores.password}</span>}
                         </div>
 
                         <div className="form-group">
-                            <label>Confirmar contraseña</label>
-                            <input type="password" name="confirmarPassword" value={formulario.confirmarPassword} onChange={handleChange} />
-                            {errores.confirmarPassword && <span className="error-text">{errores.confirmarPassword}</span>}
+                            <label htmlFor="campo-confirmarPassword">Confirmar contraseña</label>
+                            <input
+                        id="campo-confirmarPassword"
+                        aria-invalid={!!errores.confirmarPassword}
+                        aria-describedby={errores.confirmarPassword ? "error-confirmarPassword" : undefined} type="password" name="confirmarPassword" value={formulario.confirmarPassword} onChange={handleChange} />
+                            {errores.confirmarPassword && <span className="error-text" id="error-confirmarPassword">{errores.confirmarPassword}</span>}
                         </div>
 
                         <div className="form-group">
-                            <label>Rol</label>
-                            <select name="rol" value={formulario.rol} onChange={handleChange}>
+                            <label htmlFor="campo-rol">Rol</label>
+                            <select
+                        id="campo-rol"
+                        aria-invalid={!!errores.rol}
+                        aria-describedby={errores.rol ? "error-rol" : undefined} name="rol" value={formulario.rol} onChange={handleChange}>
                                 <option value="admin">Administrador</option>
                                 <option value="barbero">Barbero</option>
                             </select>
-                            {errores.rol && <span className="error-text">{errores.rol}</span>}
+                            {errores.rol && <span className="error-text" id="error-rol">{errores.rol}</span>}
                         </div>
 
                         {formulario.rol === "barbero" && (
                             <div className="form-group">
-                                <label>Barbero asociado</label>
-                                <select name="barberoId" value={formulario.barberoId} onChange={handleChange}>
+                                <label htmlFor="campo-barberoId">Barbero asociado</label>
+                                <select
+                        id="campo-barberoId"
+                        aria-invalid={!!errores.barberoId}
+                        aria-describedby={errores.barberoId ? "error-barberoId" : undefined} name="barberoId" value={formulario.barberoId} onChange={handleChange}>
                                     <option value="">Seleccione un barbero</option>
                                     {barberosSinUsuario.map((b) => (
                                         <option key={b.id} value={b.id}>{b.nombre}</option>
                                     ))}
                                 </select>
-                                {errores.barberoId && <span className="error-text">{errores.barberoId}</span>}
+                                {errores.barberoId && <span className="error-text" id="error-barberoId">{errores.barberoId}</span>}
                             </div>
                         )}
                     </>
@@ -157,8 +179,9 @@ export default function UsuarioForm({
 
                 {esEdicion && (
                     <div className="form-group">
-                        <label>Estado</label>
-                        <select name="activo" value={formulario.activo} onChange={handleChange}>
+                        <label htmlFor="campo-activo">Estado</label>
+                        <select
+                        id="campo-activo" name="activo" value={formulario.activo} onChange={handleChange}>
                             <option value={true}>Activo</option>
                             <option value={false}>Inactivo</option>
                         </select>

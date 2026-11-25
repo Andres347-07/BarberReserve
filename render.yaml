@@ -1,0 +1,62 @@
+# Blueprint de Render para Barber Reserve (plan gratuito).
+# En Render: New > Blueprint > elegir este repositorio.
+#
+# Si Render asigna a un servicio una URL distinta a la esperada (por ejemplo,
+# con un sufijo porque el nombre ya existía), corrige VITE_API_URL en el
+# frontend y CORS_ORIGIN en el backend, y vuelve a desplegar.
+
+databases:
+  - name: barberreserve-db
+    plan: free
+    region: virginia
+    databaseName: barberreserve
+    user: barberreserve
+
+services:
+  # API (Express + Sequelize)
+  - type: web
+    name: barberreserve-diego-api
+    runtime: node
+    plan: free
+    region: virginia
+    rootDir: backend
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/salud
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: barberreserve-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: APP_TIMEZONE
+        value: America/Bogota
+      - key: TRUST_PROXY
+        value: "true"
+      - key: CORS_ORIGIN
+        value: https://barberreserve-diego.onrender.com
+
+  # Portal y panel (React + Vite como sitio estático)
+  - type: web
+    name: barberreserve-diego
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://barberreserve-diego-api.onrender.com/api
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin

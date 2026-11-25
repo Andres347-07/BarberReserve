@@ -15,6 +15,7 @@ router.get("/:id", auth, permitirRoles("admin"), (req, res) => reservaController
 // Solo el administrador crea y elimina reservas.
 router.post("/", auth, permitirRoles("admin"), (req, res) => reservaController.crear(req, res));
 router.delete("/:id", auth, permitirRoles("admin"), (req, res) => reservaController.eliminar(req, res));
+router.patch("/:id/cancelar", auth, permitirRoles("admin"), (req, res) => reservaController.cancelar(req, res));
 
 
 router.put("/:id", auth, permitirRoles("admin", "barbero"), (req, res) =>

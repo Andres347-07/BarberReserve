@@ -67,9 +67,13 @@ export default function Servicios() {
 
     { key: "nombre", label: "Servicio" },
     { key: "descripcion", label: "Descripción" },
-    { key: "duracion", label: "Duración (min)" },
-    { key: "precio", label: "Precio" },
-    { key: "estado", label: "Estado" },
+    { key: "duracion", label: "Duración", render: (row) => `${row.duracion} min` },
+    { key: "precio", label: "Precio", render: (row) => Number(row.precio).toLocaleString("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }) },
+    {
+      key: "estado",
+      label: "Estado",
+      render: (row) => <span className={`estado-badge estado-${String(row.estado).toLowerCase()}`}>{row.estado}</span>,
+    },
 
   ];
 
@@ -207,7 +211,8 @@ export default function Servicios() {
           <div className="servicios-toolbar">
 
             <input
-              type="text"
+              type="search"
+              aria-label="Buscar servicios por nombre"
               placeholder="Buscar servicio por nombre..."
               className="search-input"
               value={busqueda}
@@ -217,6 +222,7 @@ export default function Servicios() {
           </div>
 
           <DataTable
+            caption="Servicios de la barbería"
             columns={columnas}
             data={serviciosFiltrados}
             showActions={true}

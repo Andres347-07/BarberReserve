@@ -75,7 +75,7 @@ describe("servicio.service — validaciones y eliminación bloqueada por reserva
 
         await horarioService.crear({
             barberoId: barbero.id,
-            fecha: "2026-08-12",
+            fecha: "2099-08-12",
             horaInicio: "08:00",
             horaFin: "14:00",
             estado: "Activo",
@@ -85,7 +85,7 @@ describe("servicio.service — validaciones y eliminación bloqueada por reserva
             clienteId: cliente.id,
             barberoId: barbero.id,
             servicioId: servicio.id,
-            fecha: "2026-08-12",
+            fecha: "2099-08-12",
             hora: "09:00",
         });
 

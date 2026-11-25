@@ -37,6 +37,36 @@ const horarioService = {
 
     },
 
+    async obtenerPlantilla(barberoId) {
+        const { data } = await api.get(`/horarios/plantilla/${barberoId}`);
+        return data.data;
+    },
+
+    async obtenerMiPlantilla() {
+        const { data } = await api.get("/horarios/plantilla/mia");
+        return data.data;
+    },
+
+    async guardarPlantilla(barberoId, dias) {
+        const { data } = await api.put(`/horarios/plantilla/${barberoId}`, { dias });
+        return data;
+    },
+
+    async obtenerBloqueos(filtros = {}) {
+        const { data } = await api.get("/horarios/bloqueos", { params: filtros });
+        return data.data;
+    },
+
+    async crearBloqueo(bloqueo) {
+        const { data } = await api.post("/horarios/bloqueos", bloqueo);
+        return data;
+    },
+
+    async eliminarBloqueo(id) {
+        const { data } = await api.delete(`/horarios/bloqueos/${id}`);
+        return data;
+    },
+
     async eliminarHorario(id) {
 
         const { data } = await api.delete(`/horarios/${id}`);

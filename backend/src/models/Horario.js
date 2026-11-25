@@ -36,6 +36,20 @@ const Horario = sequelize.define(
             allowNull: true,
         },
 
+        // Pausa dentro del turno (horario partido, p. ej. almuerzo 12:00-14:00).
+        pausaInicio: {
+            type: DataTypes.TIME,
+            allowNull: true,
+        },
+        pausaFin: {
+            type: DataTypes.TIME,
+            allowNull: true,
+        },
+        // Nota visible para el equipo (p. ej. "Vacaciones", "Festivo").
+        motivo: {
+            type: DataTypes.STRING(120),
+            allowNull: true,
+        },
         estado: {
             type: DataTypes.ENUM("Activo", "Descanso"),
             allowNull: false,

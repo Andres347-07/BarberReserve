@@ -1,6 +1,7 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 
 import AdminLayout from "../layouts/AdminLayout";
+import PublicLayout from "../layouts/PublicLayout";
 import PrivateRoute from "./PrivateRoute";
 import { useAuth } from "../contexts/useAuth";
 
@@ -13,6 +14,11 @@ import Horarios from "../pages/Horarios";
 import Reservas from "../pages/Reservas";
 import Agenda from "../pages/Agenda";
 import Usuarios from "../pages/Usuarios";
+import Configuracion from "../pages/Configuracion";
+import Inicio from "../pages/Portal/Inicio";
+import Reservar from "../pages/Portal/Reservar";
+import MiReserva from "../pages/Portal/MiReserva";
+import Accesibilidad from "../pages/Portal/Accesibilidad";
 
 function InicioSegunRol() {
   const { usuario } = useAuth();
@@ -23,8 +29,18 @@ function InicioSegunRol() {
 function NoAutorizado() {
   return (
     <div style={{ padding: 40 }}>
-      <h2>No autorizado</h2>
+      <h1>No autorizado</h1>
       <p>No tienes permisos para acceder a esta sección.</p>
+    </div>
+  );
+}
+
+function NoEncontrada() {
+  return (
+    <div className="portal-contenedor portal-pagina">
+      <h1 className="reservar-titulo">Página no encontrada</h1>
+      <p className="page-subtitle" style={{ margin: "8px 0 20px" }}>La dirección que buscas no existe o cambió.</p>
+      <Link to="/" className="btn-primary">Volver al inicio</Link>
     </div>
   );
 }
@@ -37,7 +53,17 @@ export default function AppRouter() {
 
       <Routes>
 
-        <Route path="/" element={<InicioSegunRol />} />
+        {/* Portal público de clientes (sin iniciar sesión) */}
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<Inicio />} />
+          <Route path="/reservar" element={<Reservar />} />
+          <Route path="/mi-reserva" element={<MiReserva />} />
+          <Route path="/accesibilidad" element={<Accesibilidad />} />
+          <Route path="*" element={<NoEncontrada />} />
+        </Route>
+
+        {/* Entrada al panel: redirige según el rol (antes estaba en "/") */}
+        <Route path="/panel" element={<InicioSegunRol />} />
 
         <Route path="/login" element={<Login />} />
 
@@ -102,6 +128,14 @@ export default function AppRouter() {
             element={
               <PrivateRoute roles={["admin"]}>
                 <Usuarios />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/configuracion"
+            element={
+              <PrivateRoute roles={["admin"]}>
+                <Configuracion />
               </PrivateRoute>
             }
           />

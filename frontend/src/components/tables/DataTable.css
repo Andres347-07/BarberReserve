@@ -9,28 +9,28 @@
     overflow-x:auto;
 }
 
-table{
+:is(.tabla-container, .horario-form) table{
     width:100%;
     border-collapse:collapse;
     table-layout:fixed;
 }
 
-th{
-    background:#3366FF;
+:is(.tabla-container, .horario-form) th{
+    background:var(--brand-500);
     color:white;
     text-align:left;
     padding:15px;
     vertical-align:middle;
 }
 
-td{
+:is(.tabla-container, .horario-form) td{
     padding:15px;
-    border-bottom:1px solid #eee;
+    border-bottom:1px solid var(--border);
     vertical-align:middle;
 }
 
-tr:hover{
-    background:#f7f8fc;
+:is(.tabla-container, .horario-form) tr:hover{
+    background:var(--row-hover);
 }
 
 .acciones{
@@ -40,7 +40,7 @@ tr:hover{
 }
 
 .btn-edit{
-    background:#2563eb;
+    background:var(--brand-500);
     color:white;
     border:none;
     padding:8px 12px;
@@ -52,7 +52,7 @@ tr:hover{
 }
 
 .btn-delete{
-    background:#dc2626;
+    background:var(--danger-700);
     color:white;
     border:none;
     padding:8px 12px;
@@ -64,7 +64,7 @@ tr:hover{
 }
 
 .btn-edit:hover{
-    background:#1d4ed8;
+    background:var(--brand-700);
 }
 
 .btn-delete:hover{
@@ -74,8 +74,8 @@ tr:hover{
 
 /* Columna Acciones */
 
-th:last-child,
-td:last-child{
+.tabla-container th:last-child,
+.tabla-container td:last-child{
     width:130px;
     text-align:center;
 }
@@ -93,7 +93,7 @@ td:last-child{
     justify-content: center;
     gap: 16px;
     padding: 14px;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--border);
     font-size: 14px;
     color: #475569;
 }
@@ -104,7 +104,7 @@ td:last-child{
     padding: 7px 14px;
     border-radius: 8px;
     cursor: pointer;
-    color: #1e293b;
+    color: var(--text);
     font-weight: 500;
 }
 
@@ -122,3 +122,11 @@ td:last-child{
     opacity: 0.4;
     cursor: not-allowed;
 }
+
+/* --- Barber Reserve 2.0 --- */
+.tabla-scroll:focus-visible{ outline-offset:-3px; }
+.tabla-vacia{ text-align:center; color:var(--text-muted); padding:32px 16px !important; }
+.tabla-container th:last-child, .tabla-container td:last-child{ width:170px; }
+.tabla-paginacion{ color:var(--text-muted); }
+.tabla-paginacion button{ border:1px solid var(--border-input); background:var(--surface); }
+.tabla-paginacion button:disabled{ opacity:.55; }

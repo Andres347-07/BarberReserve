@@ -32,7 +32,7 @@ describe("reserva.service — validación de disponibilidad (turnos semanales)",
         
         await horarioService.crear({
             barberoId: barbero.id,
-            fecha: "2026-07-27",
+            fecha: "2099-07-27",
             horaInicio: "08:00",
             horaFin: "14:00",
             estado: "Activo",
@@ -41,7 +41,7 @@ describe("reserva.service — validación de disponibilidad (turnos semanales)",
        
         await horarioService.crear({
             barberoId: barbero.id,
-            fecha: "2026-07-28",
+            fecha: "2099-07-28",
             estado: "Descanso",
         });
     });
@@ -55,7 +55,7 @@ describe("reserva.service — validación de disponibilidad (turnos semanales)",
             clienteId: cliente.id,
             barberoId: barbero.id,
             servicioId: servicio.id,
-            fecha: "2026-07-27",
+            fecha: "2099-07-27",
             hora: "09:00",
         });
 
@@ -70,7 +70,7 @@ describe("reserva.service — validación de disponibilidad (turnos semanales)",
                 clienteId: cliente.id,
                 barberoId: barbero.id,
                 servicioId: servicio.id,
-                fecha: "2026-07-27",
+                fecha: "2099-07-27",
                 hora: "09:15", 
             })
         ).rejects.toThrow(/ya existe una reserva en ese horario/i);
@@ -82,7 +82,7 @@ describe("reserva.service — validación de disponibilidad (turnos semanales)",
                 clienteId: cliente.id,
                 barberoId: barbero.id,
                 servicioId: servicio.id,
-                fecha: "2026-07-28",
+                fecha: "2099-07-28",
                 hora: "09:00",
             })
         ).rejects.toThrow(/no se encuentra disponible/i);
@@ -94,7 +94,7 @@ describe("reserva.service — validación de disponibilidad (turnos semanales)",
                 clienteId: cliente.id,
                 barberoId: barbero.id,
                 servicioId: servicio.id,
-                fecha: "2026-07-27",
+                fecha: "2099-07-27",
                 hora: "15:00", 
             })
         ).rejects.toThrow(/fuera del turno/i);
@@ -105,7 +105,7 @@ describe("reserva.service — validación de disponibilidad (turnos semanales)",
             clienteId: cliente.id,
             barberoId: barbero.id,
             servicioId: servicio.id,
-            fecha: "2026-07-27",
+            fecha: "2099-07-27",
             hora: "10:00",
         });
 

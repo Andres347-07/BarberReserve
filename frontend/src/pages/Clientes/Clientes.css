@@ -15,11 +15,11 @@
 }
 
 .clientes-header p{
-    color:#6b7280;
+    color:var(--text-muted);
 }
 
 .btn-primary{
-    background:#3366FF;
+    background:var(--brand-500);
     color:white;
     border:none;
     padding:12px 18px;
@@ -40,7 +40,7 @@
 .search-input{
     width:320px;
     padding:12px;
-    border:1px solid #ddd;
+    border:1px solid var(--border-input);
     border-radius:10px;
     outline:none;
 }
@@ -52,30 +52,30 @@
     box-shadow:0 5px 15px rgba(0,0,0,.08);
 }
 
-table{
+:is(.tabla-container, .horario-form) table{
     width:100%;
     border-collapse:collapse;
 }
 
-th{
-    background:#3366FF;
+:is(.tabla-container, .horario-form) th{
+    background:var(--brand-500);
     color:white;
     text-align:left;
     padding:15px;
 }
 
-td{
+:is(.tabla-container, .horario-form) td{
     padding:15px;
-    border-bottom:1px solid #eee;
+    border-bottom:1px solid var(--border);
 }
 
-tr:hover{
-    background:#f7f8fc;
+:is(.tabla-container, .horario-form) tr:hover{
+    background:var(--row-hover);
 }
 
 .btn-action{
-    background:#EEF4FF;
-    color:#3366FF;
+    background:var(--brand-50);
+    color:var(--brand-600);
     border:none;
     padding:8px 14px;
     border-radius:8px;

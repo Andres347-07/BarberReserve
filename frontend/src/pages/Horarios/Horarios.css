@@ -15,7 +15,7 @@
 }
 
 .horarios-header p{
-    color: #6b7280;
+    color: var(--text-muted);
 }
 
 .horarios-toolbar{
@@ -27,18 +27,18 @@
 .search-input{
     width: 320px;
     padding: 12px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--border-input);
     border-radius: 10px;
     outline: none;
     font-size: 15px;
 }
 
 .search-input:focus{
-    border-color: #3366FF;
+    border-color: var(--brand-500);
 }
 
 .btn-primary{
-    background: #3366FF;
+    background: var(--brand-500);
     color: white;
     border: none;
     padding: 12px 20px;
@@ -48,7 +48,7 @@
 }
 
 .btn-primary:hover{
-    background: #2952cc;
+    background: var(--brand-600);
 }
 @media (max-width: 768px) {
     .horarios-header {
@@ -57,3 +57,64 @@
         gap: 12px;
     }
 }
+
+/* --- Barber Reserve 2.1: gestión de horarios --- */
+.horario-gestion h1{ margin:6px 0 18px; }
+.horario-volver{ min-height:40px; padding:6px 10px; }
+
+.horario-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-lg);
+    padding:24px;
+    box-shadow:var(--shadow-sm);
+}
+.horario-card h2{ font-size:1.25rem; }
+.horario-card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-bottom:16px;
+}
+.horario-presets{ display:flex; flex-wrap:wrap; gap:8px; }
+
+.turnos-scroll{ overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius); }
+.turnos-tabla{ width:100%; min-width:760px; border-collapse:collapse; }
+.turnos-tabla th, .turnos-tabla td{ padding:10px 12px; border-bottom:1px solid var(--border); text-align:left; vertical-align:middle; }
+.turnos-tabla thead th{ background:var(--brand-50); color:var(--brand-700); font-size:.8rem; text-transform:uppercase; letter-spacing:.04em; }
+.turnos-tabla tbody th{ font-weight:700; color:var(--text-strong); min-width:150px; }
+.turnos-tabla tbody tr:last-child th, .turnos-tabla tbody tr:last-child td{ border-bottom:none; }
+.turnos-tabla select, .turnos-tabla input{
+    min-height:40px; padding:6px 8px; border:1px solid var(--border-input); border-radius:8px; background:var(--surface);
+}
+.turnos-tabla input:disabled, .turnos-tabla select:disabled{ background:var(--neutral-50); color:var(--neutral-700); }
+.turnos-tabla input[aria-invalid="true"]{ border-color:var(--danger-700); box-shadow:0 0 0 1px var(--danger-700); }
+.turno-descanso{ background:var(--surface-alt); }
+.turno-fecha{ display:block; font-weight:400; font-size:.8rem; color:var(--text-muted); }
+.turno-origen{ display:inline-block; margin-top:4px; font-size:.72rem; font-weight:600; color:var(--warning-700); background:var(--warning-50); border-radius:999px; padding:1px 8px; }
+.turno-error{ display:block; margin-top:4px; font-weight:500; font-size:.8rem; color:var(--danger-700); max-width:220px; }
+.turno-horas{ font-variant-numeric:tabular-nums; font-weight:600; white-space:nowrap; }
+.turnos-opcional{ font-weight:400; text-transform:none; letter-spacing:0; }
+
+.horas-resumen{
+    display:flex; align-items:center; gap:8px;
+    margin-top:14px; padding:12px 16px;
+    border-radius:var(--radius);
+    background:var(--brand-50); color:var(--info-700);
+    border:1px solid var(--brand-100);
+}
+.horas-resumen.excede{ background:var(--warning-50); color:var(--warning-700); border-color:#FCD34D; }
+.aviso-info{ padding:10px 14px; border-radius:var(--radius); background:var(--brand-50); color:var(--info-700); margin-bottom:12px; }
+.aviso-advertencia{ padding:10px 14px; border-radius:var(--radius); background:var(--warning-50); color:var(--warning-700); margin-top:12px; }
+
+.bloqueo-form{ display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:0 14px; align-items:end; margin-top:12px; }
+.bloqueo-accion{ margin-bottom:20px; }
+.bloqueos-subtitulo{ font-size:1rem; margin:8px 0 10px; }
+.bloqueos-lista{ list-style:none; display:flex; flex-direction:column; gap:8px; }
+.bloqueos-lista li{
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+    padding:10px 14px; border:1px solid var(--border); border-radius:var(--radius); background:var(--surface-alt);
+}
+.capitalizar::first-letter{ text-transform:uppercase; }

@@ -1,4 +1,8 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+// Tiempo suficiente para leer el mensaje (WCAG 2.2.1). Los errores
+// permanecen más tiempo y siempre pueden cerrarse manualmente.
+const DURACION_MS = { success: 6000, info: 6000, warning: 8000, error: 10000 };
 
 
 export default function useToast(){
@@ -11,8 +15,13 @@ export default function useToast(){
     });
 
 
+    const temporizador=useRef(null);
+
+    useEffect(()=>()=>clearTimeout(temporizador.current),[]);
+
     const mostrarToast=(mensaje,tipo="success")=>{
 
+        clearTimeout(temporizador.current);
 
         setToast({
 
@@ -21,10 +30,7 @@ export default function useToast(){
 
         });
 
-
-
-        setTimeout(()=>{
-
+        temporizador.current=setTimeout(()=>{
 
             setToast({
 
@@ -33,10 +39,7 @@ export default function useToast(){
 
             });
 
-
-        },3000);
-
-
+        },DURACION_MS[tipo]||6000);
 
     };
 

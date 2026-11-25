@@ -15,16 +15,16 @@
 }
 
 .usuarios-header p{
-    color:#6b7280;
+    color:var(--text-muted);
 }
 
 .usuarios-nota{
-    color:#6b7280;
+    color:var(--text-muted);
     font-size:14px;
 }
 
 .btn-primary{
-    background:#3366FF;
+    background:var(--brand-500);
     color:white;
     border:none;
     padding:12px 20px;
@@ -34,12 +34,12 @@
 }
 
 .btn-primary:hover{
-    background:#2954d4;
+    background:var(--brand-700);
 }
 
 .btn-secondary{
-    background:#e5e7eb;
-    color:#374151;
+    background:var(--border);
+    color:var(--text-strong);
     border:none;
     padding:8px 14px;
     border-radius:8px;
@@ -48,7 +48,7 @@
 }
 
 .btn-secondary:hover{
-    background:#d1d5db;
+    background:var(--border-input);
 }
 
 .estado-badge {
@@ -65,8 +65,8 @@
 }
 
 .estado-finalizada {
-    background: #e5e7eb;
-    color: #374151;
+    background: var(--border);
+    color: var(--text-strong);
 }
 
 @media (max-width: 768px) {
