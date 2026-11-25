@@ -371,3 +371,5 @@ font-size:26px;
 }
 .login-cliente{ margin-top:18px; text-align:center; font-size:.95rem; }
 .login-cliente a{ color:var(--brand-600); font-weight:600; text-decoration:underline; text-underline-offset:3px; }
+.login-olvido{ margin-top:16px; text-align:center; font-size:.95rem; }
+.login-olvido a{ color:var(--brand-600); font-weight:600; text-decoration:underline; text-underline-offset:3px; }

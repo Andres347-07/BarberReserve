@@ -2,6 +2,7 @@ import enfocarPrimerError from "../../../utils/enfocarPrimerError";
 import { useEffect, useState } from "react";
 
 import "./UsuarioForm.css";
+import { AYUDA_PASSWORD, errorPassword } from "../../../utils/password";
 
 import barberoService from "../../../services/barberoService";
 
@@ -9,6 +10,8 @@ export default function UsuarioForm({
     usuario = null,
     onCancel,
     onSave,
+    puedeCrearAdmin = true,
+    esPropio = false,
 }) {
 
     const esEdicion = !!usuario;
@@ -21,7 +24,7 @@ export default function UsuarioForm({
         email: usuario?.email || "",
         password: "",
         confirmarPassword: "",
-        rol: usuario?.rol || "admin",
+        rol: usuario?.rol || (puedeCrearAdmin ? "admin" : "barbero"),
         barberoId: usuario?.barberoId || "",
         activo: usuario?.activo ?? true,
     });
@@ -49,11 +52,8 @@ export default function UsuarioForm({
         }
 
         if (!esEdicion) {
-            if (!formulario.password) {
-                nuevosErrores.password = "La contraseña es obligatoria.";
-            } else if (formulario.password.length < 6) {
-                nuevosErrores.password = "La contraseña debe tener al menos 6 caracteres.";
-            }
+            const ep = errorPassword(formulario.password);
+            if (ep) nuevosErrores.password = ep;
 
             if (formulario.confirmarPassword !== formulario.password) {
                 nuevosErrores.confirmarPassword = "Las contraseñas no coinciden.";
@@ -134,7 +134,8 @@ export default function UsuarioForm({
                             <input
                         id="campo-password"
                         aria-invalid={!!errores.password}
-                        aria-describedby={errores.password ? "error-password" : undefined} type="password" name="password" value={formulario.password} onChange={handleChange} />
+                        aria-describedby={errores.password ? "ayuda-password error-password" : "ayuda-password"} type="password" name="password" autoComplete="new-password" value={formulario.password} onChange={handleChange} />
+                            <span className="campo-ayuda" id="ayuda-password">{AYUDA_PASSWORD} La persona deberá cambiarla al entrar.</span>
                             {errores.password && <span className="error-text" id="error-password">{errores.password}</span>}
                         </div>
 
@@ -153,7 +154,7 @@ export default function UsuarioForm({
                         id="campo-rol"
                         aria-invalid={!!errores.rol}
                         aria-describedby={errores.rol ? "error-rol" : undefined} name="rol" value={formulario.rol} onChange={handleChange}>
-                                <option value="admin">Administrador</option>
+                                {puedeCrearAdmin && <option value="admin">Administrador</option>}
                                 <option value="barbero">Barbero</option>
                             </select>
                             {errores.rol && <span className="error-text" id="error-rol">{errores.rol}</span>}
@@ -177,7 +178,7 @@ export default function UsuarioForm({
                     </>
                 )}
 
-                {esEdicion && (
+                {esEdicion && !esPropio && (
                     <div className="form-group">
                         <label htmlFor="campo-activo">Estado</label>
                         <select

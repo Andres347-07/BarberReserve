@@ -1,90 +1,250 @@
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
+const { fn, col, where: dondeSql } = require("sequelize");
 
+const sequelize = require("../database/connection");
 const Usuario = require("../models/Usuario");
 const Barbero = require("../models/Barbero");
+const configuracionService = require("./configuracion.service");
 const { firmarToken } = require("../utils/jwt");
+const { esProduccion } = require("../utils/entorno");
 const generarPasswordTemporal = require("../utils/generarPassword");
+const {
+    errorHttp,
+    validarPassword,
+    normalizarEmail,
+    generarCodigoRecuperacion,
+    normalizarCodigo,
+    igualesSeguro,
+} = require("../utils/seguridad");
 
 const SALT_ROUNDS = 10;
+const EMAIL_VALIDO = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
+// Hash de relleno: se compara aunque el correo no exista para que el tiempo
+// de respuesta no revele qué correos están registrados.
+const HASH_RELLENO = bcrypt.hashSync("relleno-sin-uso-0", SALT_ROUNDS);
+
+/**
+ * Jerarquía de cuentas:
+ *   Dueño (administrador con esPropietario) > Administrador > Barbero
+ *
+ * - El dueño se crea en la configuración inicial (pantalla web, sin Postman).
+ * - Solo el dueño crea, edita o desactiva otros administradores y les
+ *   restablece la contraseña. También puede traspasar la propiedad.
+ * - Nadie puede desactivar al dueño ni cambiarle la contraseña. Si la olvida,
+ *   la recupera con su código de recuperación.
+ * - No existe un "súper administrador" del desarrollador: sería una puerta
+ *   trasera. Si el dueño pierde también el código, se usa el script
+ *   `npm run restablecer-acceso`, que exige acceso directo a la base de datos.
+ */
 class AuthService {
 
-    /**
-     * Registro público. Solo permite crear el PRIMER administrador del
-     * sistema (arranque inicial). Una vez existe al menos un administrador,
-     * esta vía se cierra: los demás usuarios (admins o barberos) deben ser
-     * creados por un administrador autenticado mediante `crearUsuario`.
-     */
-    async registrarPrimerAdmin({ nombre, email, password }) {
-        if (!nombre || !email || !password) {
-            throw new Error("Nombre, correo y contraseña son obligatorios.");
-        }
-
-        if (password.length < 6) {
-            throw new Error("La contraseña debe tener al menos 6 caracteres.");
-        }
-
-        const existeAdmin = await Usuario.findOne({ where: { rol: "admin" } });
-
-        if (existeAdmin) {
-            throw new Error(
-                "Ya existe un administrador registrado. Solicita a un administrador que cree tu usuario desde el panel."
-            );
-        }
-
-        const existeEmail = await Usuario.findOne({ where: { email } });
-        if (existeEmail) {
-            throw new Error("El correo ya está registrado.");
-        }
-
-        const hash = await bcrypt.hash(password, SALT_ROUNDS);
-
-        const usuario = await Usuario.create({
-            nombre,
-            email,
-            password: hash,
-            rol: "admin",
+    buscarPorEmail(email, opciones = {}) {
+        return Usuario.findOne({
+            where: dondeSql(fn("lower", col("email")), normalizarEmail(email)),
+            ...opciones,
         });
+    }
 
-        return this.sanear(usuario);
+    // ------------------------------------------------------------------
+    // Configuración inicial (primer uso)
+    // ------------------------------------------------------------------
+
+    /** Lo que la pantalla de configuración inicial necesita saber. */
+    async estadoInstalacion() {
+        const instalado = (await Usuario.count({ where: { rol: "admin" } })) > 0;
+        const requiereCodigo = Boolean(process.env.CODIGO_INSTALACION);
+        const disponible = requiereCodigo || !esProduccion();
+        return { instalado, requiereCodigo, disponible };
     }
 
     /**
-     * Creación de usuarios por parte de un administrador ya autenticado.
-     * Permite crear tanto otros administradores como cuentas de barbero
-     * (vinculadas a un registro existente en la tabla `barberos`).
+     * Crea la cuenta del dueño del negocio. Solo funciona mientras no exista
+     * ningún administrador. En producción exige el código de instalación
+     * (variable CODIGO_INSTALACION) para que un extraño no pueda adueñarse
+     * del sistema recién desplegado.
+     *
+     * Devuelve el usuario y su código de recuperación (se muestra una sola vez).
      */
-    async crearUsuario({ nombre, email, password, rol, barberoId }) {
+    async configuracionInicial({ nombreNegocio, nombre, email, password, codigoInstalacion } = {}) {
+        const esperado = process.env.CODIGO_INSTALACION;
+        if (esperado) {
+            if (!igualesSeguro(String(codigoInstalacion || "").trim(), esperado.trim())) {
+                throw errorHttp(403, "El código de instalación no es correcto.");
+            }
+        } else if (esProduccion()) {
+            throw errorHttp(
+                403,
+                "La configuración inicial está deshabilitada: falta definir CODIGO_INSTALACION en el servidor."
+            );
+        }
+
+        nombre = typeof nombre === "string" ? nombre.trim() : "";
+        email = normalizarEmail(email);
+        if (!nombre || !email || !password) {
+            throw errorHttp(400, "Nombre, correo y contraseña son obligatorios.");
+        }
+        if (nombre.length > 80) throw errorHttp(400, "El nombre no puede superar 80 caracteres.");
+        if (!EMAIL_VALIDO.test(email)) throw errorHttp(400, "Ingrese un correo electrónico válido.");
+        validarPassword(password);
+
+        const negocio = typeof nombreNegocio === "string" ? nombreNegocio.trim() : "";
+        if (negocio.length > 80) throw errorHttp(400, "El nombre del negocio no puede superar 80 caracteres.");
+
+        const codigoRecuperacion = generarCodigoRecuperacion();
+        const [hash, hashCodigo] = await Promise.all([
+            bcrypt.hash(password, SALT_ROUNDS),
+            bcrypt.hash(normalizarCodigo(codigoRecuperacion), SALT_ROUNDS),
+        ]);
+
+        const usuario = await sequelize.transaction(async (transaction) => {
+            // Evita que dos personas configuren el sistema al mismo tiempo
+            await sequelize.query("SELECT pg_advisory_xact_lock(hashtext('barberreserve:configuracion-inicial'))", { transaction });
+
+            const existeAdmin = await Usuario.count({ where: { rol: "admin" }, transaction });
+            if (existeAdmin) {
+                throw errorHttp(
+                    409,
+                    "El sistema ya fue configurado. Inicia sesión o pide al dueño del negocio que cree tu cuenta."
+                );
+            }
+            if (await this.buscarPorEmail(email, { transaction })) {
+                throw errorHttp(400, "El correo ya está registrado.");
+            }
+
+            const creado = await Usuario.create(
+                { nombre, email, password: hash, rol: "admin", esPropietario: true, recuperacionHash: hashCodigo },
+                { transaction }
+            );
+            return creado;
+        });
+
+        if (negocio) await configuracionService.actualizar({ nombreNegocio: negocio });
+
+        return { usuario: this.sanear(usuario), codigoRecuperacion };
+    }
+
+    /** Compatibilidad con la ruta anterior POST /api/auth/register. */
+    async registrarPrimerAdmin(datos) {
+        const { usuario } = await this.configuracionInicial(datos);
+        return usuario;
+    }
+
+    // ------------------------------------------------------------------
+    // Recuperación de acceso del dueño
+    // ------------------------------------------------------------------
+
+    async recuperarAcceso({ email, codigoRecuperacion, passwordNueva } = {}) {
+        const mensaje = "El correo o el código de recuperación no son correctos.";
+        if (!email || !codigoRecuperacion || !passwordNueva) {
+            throw errorHttp(400, "Correo, código de recuperación y nueva contraseña son obligatorios.");
+        }
+        validarPassword(passwordNueva, "La nueva contraseña");
+
+        const usuario = await this.buscarPorEmail(email);
+        const valido = await bcrypt.compare(
+            normalizarCodigo(codigoRecuperacion),
+            usuario?.recuperacionHash || HASH_RELLENO
+        );
+        if (!usuario || !usuario.esPropietario || !usuario.activo || !usuario.recuperacionHash || !valido) {
+            throw errorHttp(400, mensaje);
+        }
+
+        // El código es de un solo uso: se entrega uno nuevo
+        const nuevoCodigo = generarCodigoRecuperacion();
+        await usuario.update({
+            password: await bcrypt.hash(passwordNueva, SALT_ROUNDS),
+            recuperacionHash: await bcrypt.hash(normalizarCodigo(nuevoCodigo), SALT_ROUNDS),
+            debeCambiarPassword: false,
+            versionSesion: usuario.versionSesion + 1,
+        });
+        return { codigoRecuperacion: nuevoCodigo };
+    }
+
+    /** El dueño genera un código nuevo (el anterior deja de servir). */
+    async regenerarCodigoRecuperacion(usuarioId, { password } = {}) {
+        const usuario = await Usuario.findByPk(usuarioId);
+        if (!usuario || !usuario.esPropietario) {
+            throw errorHttp(403, "Solo el dueño del negocio tiene código de recuperación.");
+        }
+        if (!password || !(await bcrypt.compare(password, usuario.password))) {
+            throw errorHttp(400, "La contraseña no es correcta.");
+        }
+        const codigo = generarCodigoRecuperacion();
+        await usuario.update({ recuperacionHash: await bcrypt.hash(normalizarCodigo(codigo), SALT_ROUNDS) });
+        return { codigoRecuperacion: codigo };
+    }
+
+    /**
+     * Traspaso de la propiedad: el dueño entrega el negocio a otro
+     * administrador activo. El anterior dueño queda como administrador.
+     * El nuevo dueño recibe su propio código de recuperación.
+     */
+    async transferirPropiedad(actor, { usuarioId, password } = {}) {
+        const dueño = await Usuario.findByPk(actor.id);
+        if (!dueño || !dueño.esPropietario) {
+            throw errorHttp(403, "Solo el dueño del negocio puede traspasar la propiedad.");
+        }
+        if (!password || !(await bcrypt.compare(password, dueño.password))) {
+            throw errorHttp(400, "La contraseña no es correcta.");
+        }
+        const nuevo = await Usuario.findByPk(usuarioId);
+        if (!nuevo || nuevo.id === dueño.id) throw errorHttp(400, "Elige otro administrador.");
+        if (nuevo.rol !== "admin" || !nuevo.activo) {
+            throw errorHttp(400, "La propiedad solo se puede traspasar a un administrador activo.");
+        }
+
+        const codigo = generarCodigoRecuperacion();
+        const hashCodigo = await bcrypt.hash(normalizarCodigo(codigo), SALT_ROUNDS);
+        await sequelize.transaction(async (transaction) => {
+            await dueño.update({ esPropietario: false, recuperacionHash: null }, { transaction });
+            await nuevo.update({ esPropietario: true, recuperacionHash: hashCodigo }, { transaction });
+        });
+        return { nuevoDueño: this.sanear(nuevo), codigoRecuperacion: codigo };
+    }
+
+    // ------------------------------------------------------------------
+    // Usuarios
+    // ------------------------------------------------------------------
+
+    /**
+     * Creación de usuarios por un administrador autenticado. Solo el dueño
+     * puede crear otros administradores.
+     */
+    async crearUsuario({ nombre, email, password, rol, barberoId }, actor = null) {
+        email = normalizarEmail(email);
+        nombre = typeof nombre === "string" ? nombre.trim() : nombre;
         if (!nombre || !email || !password || !rol) {
-            throw new Error("Nombre, correo, contraseña y rol son obligatorios.");
+            throw errorHttp(400, "Nombre, correo, contraseña y rol son obligatorios.");
         }
 
         if (!["admin", "barbero"].includes(rol)) {
-            throw new Error("El rol debe ser 'admin' o 'barbero'.");
+            throw errorHttp(400, "El rol debe ser 'admin' o 'barbero'.");
         }
-
-        if (password.length < 6) {
-            throw new Error("La contraseña debe tener al menos 6 caracteres.");
+        if (rol === "admin" && actor && !actor.esPropietario) {
+            throw errorHttp(403, "Solo el dueño del negocio puede crear administradores.");
         }
+        if (!EMAIL_VALIDO.test(email)) throw errorHttp(400, "Ingrese un correo electrónico válido.");
 
-        const existeEmail = await Usuario.findOne({ where: { email } });
-        if (existeEmail) {
-            throw new Error("El correo ya está registrado.");
+        validarPassword(password);
+
+        if (await this.buscarPorEmail(email)) {
+            throw errorHttp(400, "El correo ya está registrado.");
         }
 
         if (rol === "barbero") {
             if (!barberoId) {
-                throw new Error("Debe indicar a qué barbero pertenece esta cuenta.");
+                throw errorHttp(400, "Debe indicar a qué barbero pertenece esta cuenta.");
             }
 
             const barbero = await Barbero.findByPk(barberoId);
             if (!barbero) {
-                throw new Error("El barbero indicado no existe.");
+                throw errorHttp(400, "El barbero indicado no existe.");
             }
 
             const yaTieneCuenta = await Usuario.findOne({ where: { barberoId } });
             if (yaTieneCuenta) {
-                throw new Error("Este barbero ya tiene una cuenta de acceso.");
+                throw errorHttp(400, "Este barbero ya tiene una cuenta de acceso.");
             }
         }
 
@@ -102,34 +262,30 @@ class AuthService {
         return this.sanear(usuario);
     }
 
-    async login({ email, password }) {
-        if (!email || !password) {
-            throw new Error("Correo y contraseña son obligatorios.");
+    async login({ email, password } = {}) {
+        if (!email || !password || typeof password !== "string") {
+            throw errorHttp(400, "Correo y contraseña son obligatorios.");
         }
 
-        const usuario = await Usuario.findOne({ where: { email } });
+        const usuario = await this.buscarPorEmail(email);
+        const coincide = await bcrypt.compare(password.slice(0, 200), usuario?.password || HASH_RELLENO);
 
-        if (!usuario || !usuario.activo) {
-            throw new Error("Credenciales inválidas.");
+        if (!usuario || !usuario.activo || !coincide) {
+            throw errorHttp(401, "Credenciales inválidas.");
         }
 
-        const coincide = await bcrypt.compare(password, usuario.password);
+        return { token: this.emitirToken(usuario), usuario: this.sanear(usuario) };
+    }
 
-        if (!coincide) {
-            throw new Error("Credenciales inválidas.");
-        }
-
-        const payload = {
+    emitirToken(usuario) {
+        return firmarToken({
             id: usuario.id,
             nombre: usuario.nombre,
             email: usuario.email,
             rol: usuario.rol,
             barberoId: usuario.barberoId,
-        };
-
-        const token = firmarToken(payload);
-
-        return { token, usuario: this.sanear(usuario) };
+            v: usuario.versionSesion || 0,
+        });
     }
 
     async obtenerPerfil(id) {
@@ -162,7 +318,7 @@ class AuthService {
             include: [{ model: Barbero, as: "barbero", attributes: ["id", "nombre"] }],
         });
 
-        if (!usuario) throw new Error("Usuario no encontrado.");
+        if (!usuario) throw errorHttp(404, "Usuario no encontrado.");
 
         return this.sanear(usuario);
     }
@@ -172,19 +328,38 @@ class AuthService {
      * El rol no se puede modificar aquí (está atado a la creación de la
      * cuenta y, en el caso de un barbero, a su registro asociado).
      */
-    async actualizar(id, { nombre, email, activo }) {
+    async actualizar(id, { nombre, email, activo } = {}, actor = null) {
         const usuario = await Usuario.findByPk(id);
         if (!usuario) return null;
 
-        if (email && email !== usuario.email) {
-            const existente = await Usuario.findOne({ where: { email } });
-            if (existente) throw new Error("El correo ya está registrado.");
+        const esElMismo = actor && Number(actor.id) === usuario.id;
+        if (actor && usuario.rol === "admin" && !esElMismo && !actor.esPropietario) {
+            throw errorHttp(403, "Solo el dueño del negocio puede modificar a otros administradores.");
+        }
+        if (activo === false || activo === "false") {
+            if (usuario.esPropietario) {
+                throw errorHttp(400, "No se puede desactivar al dueño del negocio. Primero traspasa la propiedad.");
+            }
+            if (esElMismo) throw errorHttp(400, "No puedes desactivar tu propia cuenta.");
+        }
+
+        if (email !== undefined) {
+            email = normalizarEmail(email);
+            if (!EMAIL_VALIDO.test(email)) throw errorHttp(400, "Ingrese un correo electrónico válido.");
+            if (email !== usuario.email) {
+                const existente = await this.buscarPorEmail(email);
+                if (existente && existente.id !== usuario.id) throw errorHttp(400, "El correo ya está registrado.");
+            }
         }
 
         const datos = {};
-        if (nombre !== undefined) datos.nombre = nombre;
+        if (nombre !== undefined) datos.nombre = String(nombre).trim();
         if (email !== undefined) datos.email = email;
-        if (activo !== undefined) datos.activo = activo;
+        if (activo !== undefined) {
+            datos.activo = activo === true || activo === "true";
+            // Al desactivar, las sesiones abiertas dejan de funcionar
+            if (usuario.activo && !datos.activo) datos.versionSesion = usuario.versionSesion + 1;
+        }
 
         await usuario.update(datos);
 
@@ -207,14 +382,30 @@ class AuthService {
      * texto plano una única vez para que el administrador la comunique.
      * El usuario deberá cambiarla en su próximo inicio de sesión.
      */
-    async restablecerPassword(id) {
+    async restablecerPassword(id, actor = null) {
         const usuario = await Usuario.findByPk(id);
-        if (!usuario) throw new Error("Usuario no encontrado.");
+        if (!usuario) throw errorHttp(404, "Usuario no encontrado.");
+
+        if (actor) {
+            if (usuario.esPropietario) {
+                throw errorHttp(
+                    403,
+                    "La contraseña del dueño no se puede restablecer desde aquí. El dueño la recupera con su código de recuperación."
+                );
+            }
+            if (usuario.rol === "admin" && !actor.esPropietario) {
+                throw errorHttp(403, "Solo el dueño del negocio puede restablecer la contraseña de un administrador.");
+            }
+        }
 
         const passwordTemporal = generarPasswordTemporal();
         const hash = await bcrypt.hash(passwordTemporal, SALT_ROUNDS);
 
-        await usuario.update({ password: hash, debeCambiarPassword: true });
+        await usuario.update({
+            password: hash,
+            debeCambiarPassword: true,
+            versionSesion: usuario.versionSesion + 1,
+        });
 
         return passwordTemporal;
     }
@@ -226,30 +417,34 @@ class AuthService {
      */
     async cambiarPassword(id, { passwordActual, passwordNueva }) {
         if (!passwordActual || !passwordNueva) {
-            throw new Error("Debe indicar la contraseña actual y la nueva contraseña.");
+            throw errorHttp(400, "Debe indicar la contraseña actual y la nueva contraseña.");
         }
 
-        if (passwordNueva.length < 6) {
-            throw new Error("La nueva contraseña debe tener al menos 6 caracteres.");
-        }
+        validarPassword(passwordNueva, "La nueva contraseña");
 
         const usuario = await Usuario.findByPk(id);
-        if (!usuario) throw new Error("Usuario no encontrado.");
+        if (!usuario) throw errorHttp(404, "Usuario no encontrado.");
 
         const coincide = await bcrypt.compare(passwordActual, usuario.password);
         if (!coincide) {
-            throw new Error("La contraseña actual no es correcta.");
+            throw errorHttp(400, "La contraseña actual no es correcta.");
         }
 
         const hash = await bcrypt.hash(passwordNueva, SALT_ROUNDS);
-        await usuario.update({ password: hash, debeCambiarPassword: false });
+        // Cierra las demás sesiones abiertas; esta recibe un token nuevo
+        await usuario.update({
+            password: hash,
+            debeCambiarPassword: false,
+            versionSesion: usuario.versionSesion + 1,
+        });
 
-        return this.sanear(usuario);
+        return { ...this.sanear(usuario), token: this.emitirToken(usuario) };
     }
 
   
     sanear(usuario) {
-        const { password, ...resto } = usuario.toJSON();
+        // eslint-disable-next-line no-unused-vars
+        const { password, recuperacionHash, versionSesion, ...resto } = usuario.toJSON();
         return resto;
     }
 }

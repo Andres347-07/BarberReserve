@@ -30,7 +30,13 @@ services:
         fromDatabase:
           name: barberreserve-db
           property: connectionString
+      - key: NODE_ENV
+        value: production
       - key: JWT_SECRET
+        generateValue: true
+      # Código que pide la pantalla de configuración inicial (cópialo desde
+      # Environment en el panel de Render y entrégaselo al dueño).
+      - key: CODIGO_INSTALACION
         generateValue: true
       - key: APP_TIMEZONE
         value: America/Bogota
@@ -44,7 +50,7 @@ services:
     name: barberreserve-diego
     runtime: static
     rootDir: frontend
-    buildCommand: npm ci && npm run build
+    buildCommand: npm ci --include=dev && npm run build
     staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
@@ -60,3 +66,9 @@ services:
       - path: /*
         name: Referrer-Policy
         value: strict-origin-when-cross-origin
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: Permissions-Policy
+        value: camera=(), microphone=(), geolocation=(), payment=()

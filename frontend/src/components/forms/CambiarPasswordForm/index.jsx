@@ -4,6 +4,7 @@ import useDialogo from "../../../hooks/useDialogo";
 import "./CambiarPasswordForm.css";
 
 import authService from "../../../services/authService";
+import { AYUDA_PASSWORD, errorPassword } from "../../../utils/password";
 
 export default function CambiarPasswordForm({ obligatorio = false, onExito, onCancelar }) {
 
@@ -34,8 +35,9 @@ export default function CambiarPasswordForm({ obligatorio = false, onExito, onCa
             return;
         }
 
-        if (formulario.passwordNueva.length < 6) {
-            setError("La nueva contraseña debe tener al menos 6 caracteres.");
+        const ep = errorPassword(formulario.passwordNueva, "La nueva contraseña");
+        if (ep) {
+            setError(ep);
             return;
         }
 
@@ -100,10 +102,11 @@ export default function CambiarPasswordForm({ obligatorio = false, onExito, onCa
                         type="password"
                         name="passwordNueva"
                         autoComplete="new-password"
-                        aria-describedby={error ? "error-password" : undefined}
+                        aria-describedby={error ? "ayuda-passwordNueva error-password" : "ayuda-passwordNueva"}
                         value={formulario.passwordNueva}
                         onChange={handleChange}
                     />
+                    <p className="campo-ayuda" id="ayuda-passwordNueva">{AYUDA_PASSWORD}</p>
                 </div>
 
                 <div className="form-group">

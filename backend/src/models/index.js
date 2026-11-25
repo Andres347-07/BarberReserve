@@ -8,6 +8,7 @@ const PlantillaHorario = require("./PlantillaHorario");
 const Bloqueo = require("./Bloqueo");
 const Notificacion = require("./Notificacion");
 const Configuracion = require("./Configuracion");
+const LimiteSolicitud = require("./LimiteSolicitud");
 
 
 /*
@@ -101,6 +102,7 @@ Notificacion.belongsTo(Usuario, { foreignKey: "usuarioId", as: "usuario" });
 Notificacion.belongsTo(Reserva, { foreignKey: "reservaId", as: "reserva", constraints: false });
 
 module.exports = {
+    LimiteSolicitud,
     Cliente,
     Barbero,
     Servicio,

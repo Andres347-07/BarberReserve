@@ -101,12 +101,20 @@ describe("Flujo de contraseñas: cambio obligatorio y voluntario (12.9 / 12.10)"
             .send({ passwordActual: "admin123", passwordNueva: "adminNuevaClave456" });
 
         expect(res.status).toBe(200);
+        expect(res.body.data.token).toBeTruthy();
+
+        // El token anterior queda cerrado: cambiar la contraseña cierra las otras sesiones
+        const conTokenViejo = await request(app)
+            .get("/api/auth/me")
+            .set("Authorization", `Bearer ${tokenAdmin}`);
+        expect(conTokenViejo.status).toBe(401);
 
         const login = await request(app).post("/api/auth/login").send({
             email: "admin.password-test@test.com",
             password: "adminNuevaClave456",
         });
         expect(login.status).toBe(200);
+        tokenAdmin = login.body.data.token;
     });
 
     test("restablecer la contraseña de un usuario lo vuelve a marcar para cambiarla", async () => {

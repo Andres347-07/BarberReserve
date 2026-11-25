@@ -1,0 +1,232 @@
+/* Páginas de acceso: configuración inicial y recuperación.
+   Reutilizan el panel izquierdo del inicio de sesión (Login.css). */
+
+.acceso-card {
+    width: 100%;
+    max-width: 560px;
+    background: var(--surface);
+    border-radius: 22px;
+    padding: 40px 44px;
+    box-shadow: 0 15px 40px rgb(0 0 0 / 0.1);
+}
+
+.acceso-card h1 {
+    font-size: 30px;
+    line-height: 1.2;
+    margin: 0 0 8px;
+    color: var(--text-strong);
+}
+
+.acceso-intro {
+    color: var(--text-muted);
+    margin: 0 0 24px;
+    line-height: 1.6;
+}
+
+.acceso-pasos {
+    display: flex;
+    gap: 8px;
+    margin: 0 0 20px;
+    padding: 0;
+    list-style: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.acceso-pasos li {
+    flex: 1;
+    padding-top: 8px;
+    border-top: 4px solid var(--border);
+}
+
+.acceso-pasos li[aria-current="step"] {
+    color: var(--brand-600);
+    border-top-color: var(--brand-500);
+}
+
+.acceso-pasos li.hecho {
+    border-top-color: var(--brand-200);
+}
+
+.acceso-form fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0 0 8px;
+}
+
+.acceso-form legend {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--text-strong);
+    margin-bottom: 12px;
+}
+
+.acceso-form .form-group {
+    margin-bottom: 16px;
+}
+
+.acceso-form label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text);
+}
+
+.acceso-form input {
+    width: 100%;
+    min-height: 48px;
+    border: 1px solid var(--border-input);
+    border-radius: 10px;
+    padding: 0 14px;
+    font-size: 16px;
+    background: var(--surface);
+    color: var(--text);
+}
+
+.acceso-form input[aria-invalid="true"] {
+    border-color: #b91c1c;
+    border-width: 2px;
+}
+
+.acceso-form .campo-ayuda {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 6px 0 0;
+}
+
+.acceso-form .error-text {
+    color: #b91c1c;
+    font-size: 0.9rem;
+    margin: 6px 0 0;
+}
+
+.acceso-error-general {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 0 0 16px;
+}
+
+.acceso-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.acceso-acciones .btn-primary {
+    min-height: 48px;
+    padding: 0 24px;
+    font-size: 1rem;
+}
+
+.acceso-enlaces {
+    margin: 24px 0 0;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+.acceso-enlaces a {
+    color: var(--brand-600);
+    font-weight: 600;
+}
+
+.acceso-aviso {
+    background: var(--warning-50);
+    color: var(--warning-700);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 16px 0;
+    line-height: 1.5;
+}
+
+.acceso-check {
+    display: flex !important;
+    gap: 10px;
+    align-items: flex-start;
+    font-weight: 600;
+    margin: 12px 0 0;
+}
+
+.acceso-check input {
+    width: 20px;
+    height: 20px;
+    min-height: 0;
+    margin: 2px 0 0;
+    flex: none;
+}
+
+/* Código de recuperación */
+.codigo-recuperacion {
+    border: 2px dashed var(--brand-500);
+    border-radius: 14px;
+    padding: 18px;
+    background: var(--brand-50);
+    text-align: center;
+}
+
+.codigo-recuperacion__etiqueta {
+    margin: 0 0 6px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.codigo-recuperacion__valor {
+    margin: 0 0 14px;
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: clamp(1.3rem, 4vw, 1.8rem);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--text-strong);
+    user-select: all;
+    word-break: break-all;
+}
+
+.codigo-recuperacion__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.codigo-recuperacion__acciones .btn-secondary {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.codigo-recuperacion__estado {
+    min-height: 1.4em;
+    margin: 10px 0 0;
+    font-size: 0.9rem;
+    color: var(--success-700);
+}
+
+@media (max-width: 600px) {
+    .acceso-card {
+        padding: 28px 20px;
+    }
+    .acceso-card h1 {
+        font-size: 24px;
+    }
+}
+
+@media print {
+    .login-left,
+    .acceso-pasos,
+    .acceso-acciones,
+    .codigo-recuperacion__acciones,
+    .acceso-enlaces,
+    .login-volver,
+    .aviso-servidor-region {
+        display: none !important;
+    }
+    .acceso-card {
+        box-shadow: none;
+    }
+}

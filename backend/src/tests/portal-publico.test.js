@@ -491,11 +491,11 @@ describe("Portal público — reservas sin iniciar sesión", () => {
 });
 
 describe("Limitador de solicitudes del portal", () => {
-    test("responde 429 al superar el máximo", () => {
+    test("responde 429 al superar el máximo", async () => {
         const anterior = process.env.DESACTIVAR_LIMITE;
         process.env.DESACTIVAR_LIMITE = "false";
 
-        const middleware = limitarSolicitudes({ ventanaMs: 60000, maximo: 2 });
+        const middleware = limitarSolicitudes({ ventanaMs: 60000, maximo: 2, nombre: `prueba-${Date.now()}` });
         const estados = [];
         for (let i = 0; i < 3; i++) {
             const res = {
@@ -504,7 +504,7 @@ describe("Limitador de solicitudes del portal", () => {
                 status(code) { this.statusCode = code; return this; },
                 json() { estados.push(this.statusCode); return this; },
             };
-            middleware({ ip: "1.2.3.4" }, res, () => estados.push(200));
+            await middleware({ ip: "1.2.3.4" }, res, () => estados.push(200));
         }
 
         process.env.DESACTIVAR_LIMITE = anterior;

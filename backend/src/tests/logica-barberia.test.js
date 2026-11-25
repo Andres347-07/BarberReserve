@@ -1,7 +1,7 @@
 process.env.DESACTIVAR_LIMITE = "true";
 
 const request = require("supertest");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 const app = require("../app");
 const sequelize = require("../database/connection");

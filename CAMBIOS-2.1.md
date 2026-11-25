@@ -45,7 +45,7 @@ Al pasar del paso 3 al 4 de la reserva, el mismo clic en "Continuar" enviaba el 
 Ajustes en pruebas existentes: la prueba del algoritmo de la especificación 9.6 configura explícitamente el modo original (intervalo 0, sin limpieza); dos pruebas del portal se actualizaron a los cupos de 15 minutos.
 
 ## 5. Pendiente
-- Despliegue gratuito (propuesta: Vercel + Neon) y commits ordenados por mejora.
+- Despliegue gratuito en Render.
 - Prototipo en Figma (E3), informe PDF (E1) y carpeta de evidencias (E4).
 - Pruebas con lector de pantalla (C4) y con 3 usuarios (C6): las hace el estudiante; se entrega protocolo.
 - Correo de contacto real en la declaración de accesibilidad.

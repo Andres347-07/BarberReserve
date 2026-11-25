@@ -20,8 +20,17 @@ function manejadorErrores(err, req, res, next) {
         return fail(res, 400, "Error de validación.", detalles);
     }
 
-    const status = err.status || 500;
-    const mensaje = err.message || "Ocurrió un error inesperado en el servidor.";
+    // JSON mal formado o cuerpo demasiado grande
+    if (err.type === "entity.parse.failed") return fail(res, 400, "El cuerpo de la petición no es JSON válido.");
+    if (err.type === "entity.too.large") return fail(res, 413, "La petición es demasiado grande.");
+
+    const status = err.status || err.statusCode || 500;
+    // Los errores internos no muestran detalles técnicos (consultas SQL,
+    // rutas de archivos) al usuario: quedan solo en el registro del servidor.
+    const mensaje =
+        status >= 500
+            ? "Ocurrió un error inesperado en el servidor."
+            : err.message || "La petición no es válida.";
 
     return fail(res, status, mensaje);
 }

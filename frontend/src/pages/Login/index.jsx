@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaCalendarAlt, FaUsers, FaChartLine, FaArrowLeft } from "react-icons/fa";
 
@@ -10,6 +10,7 @@ import useTituloPagina from "../../hooks/useTituloPagina";
 
 import { useAuth } from "../../contexts/useAuth";
 import useToast from "../../hooks/useToast";
+import authService from "../../services/authService";
 import Toast from "../../components/Toast";
 
 export default function Login() {
@@ -22,6 +23,18 @@ export default function Login() {
   const [error, setError] = useState("");
 
   useTituloPagina("Iniciar sesión");
+
+  // Primer uso: si todavía no existe el dueño, se lleva a la configuración inicial
+  useEffect(() => {
+    let activo = true;
+    authService
+      .estadoInstalacion()
+      .then((estado) => {
+        if (activo && !estado.instalado) navigate("/configuracion-inicial", { replace: true });
+      })
+      .catch(() => {});
+    return () => { activo = false; };
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -150,6 +163,10 @@ export default function Login() {
           <button type="submit" disabled={enviando}>
             {enviando ? "Ingresando..." : "Iniciar sesión"}
           </button>
+
+          <p className="login-olvido">
+            <Link to="/recuperar-acceso">¿Olvidaste tu contraseña?</Link>
+          </p>
 
           <p className="login-cliente">
             ¿Eres cliente? <Link to="/reservar">Reserva tu cita aquí</Link>

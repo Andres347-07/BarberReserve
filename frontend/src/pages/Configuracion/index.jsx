@@ -5,6 +5,9 @@ import useToast from "../../hooks/useToast";
 import Toast from "../../components/Toast";
 import enfocarPrimerError from "../../utils/enfocarPrimerError";
 
+import { useAuth } from "../../contexts/useAuth";
+import SeguridadDueno from "./SeguridadDueno";
+
 import "./Configuracion.css";
 
 const CAMPOS = [
@@ -18,6 +21,7 @@ const CAMPOS = [
 ];
 
 export default function Configuracion() {
+    const { usuario } = useAuth();
     const [valores, setValores] = useState(null);
     const [errores, setErrores] = useState({});
     const [guardando, setGuardando] = useState(false);
@@ -127,6 +131,8 @@ export default function Configuracion() {
                     </div>
                 </form>
             )}
+
+            {usuario?.esPropietario && <SeguridadDueno email={usuario.email} />}
         </div>
     );
 }

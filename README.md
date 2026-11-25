@@ -2,10 +2,10 @@
 
 Sistema web para la gestión de reservas en barberías, con dos roles — **administrador** y **barbero** — y validación automática de disponibilidad al agendar una cita.
 
-![Node](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)
+![Node](https://img.shields.io/badge/Node.js-20%2B-339933?logo=node.js&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-139%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-163%20passing-brightgreen)
 ![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)
 
 ## Tabla de contenido
@@ -41,6 +41,10 @@ Al crear una reserva, el sistema **calcula automáticamente las horas realmente 
 - Migración **automática e idempotente** al arrancar el backend: una base de datos de la versión 1.0 se actualiza sin perder información.
 
 Detalle completo en [`CAMBIOS-2.0.md`](CAMBIOS-2.0.md).
+
+## Novedades de Barber Reserve 2.2
+
+Configuración inicial desde el navegador (sin Postman), jerarquía Dueño → Administrador → Barbero con traspaso de la propiedad, recuperación de acceso con código, refuerzo de seguridad (límite de intentos de inicio de sesión, cierre inmediato de sesiones, cabeceras y política de contenido, contraseñas más fuertes) y despliegue gratuito en Render. Detalle en [`CAMBIOS-2.2.md`](CAMBIOS-2.2.md) y [`SEGURIDAD.md`](SEGURIDAD.md).
 
 ## Novedades de Barber Reserve 2.1
 
@@ -174,15 +178,13 @@ npm run dev
 ```
 El frontend queda disponible en `http://localhost:5174`. La URL del backend por defecto es `http://localhost:4000/api` (`frontend/src/services/api.js`); puedes cambiarla sin tocar el código definiendo `VITE_API_URL` antes de correr `npm run dev`/`npm run build`.
 
-### 3. Primer inicio de sesión
+### 3. Primer inicio de sesión (configuración inicial)
 
-No hay usuarios por defecto. El primer administrador se crea **una única vez**, con esta llamada (no tiene pantalla propia dentro de la aplicación; es intencional, así lo exige el flujo de arranque):
-```bash
-curl -X POST http://localhost:4000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"nombre":"Tu Nombre","email":"admin@barberreserve.com","password":"una_clave_segura"}'
-```
-Después de esto, esa vía queda cerrada: cualquier otro usuario debe crearlo un administrador ya autenticado, desde el módulo **Gestión de Usuarios** en el panel (o creando un barbero, que genera su usuario automáticamente).
+No hay usuarios por defecto. Abre `http://localhost:5174/login`: como todavía no hay dueño, la aplicación te lleva a **Configuración inicial**. Ahí el dueño de la barbería crea su cuenta y recibe un **código de recuperación** (para recuperar la contraseña sin ayuda). Ya no hace falta Postman.
+
+En producción la pantalla pide además el **código de instalación** (variable `CODIGO_INSTALACION`), para que un desconocido no pueda adueñarse del sistema recién desplegado.
+
+**Jerarquía de cuentas:** Dueño → Administrador → Barbero. Solo el dueño crea administradores y puede traspasar la propiedad del negocio a otro administrador. Si el dueño olvida la contraseña, usa "¿Olvidaste tu contraseña?" con su código; si pierde también el código, quien tenga acceso a la base de datos ejecuta `npm run restablecer-acceso -- correo@del-dueno.com` en `backend`.
 
 ## 🐳 Ejecutar con Docker
 
@@ -227,7 +229,7 @@ Para correrlo en segundo plano: `docker compose up --build -d`, y para ver los l
 - Frontend: **http://localhost:5174**
 - API del backend: **http://localhost:4000/api**
 
-El primer inicio de sesión funciona igual que en desarrollo local (paso 3 de la sección anterior), apuntando a `http://localhost:4000/api/auth/register`.
+El primer inicio de sesión funciona igual que en desarrollo local (paso 3 de la sección anterior): abre `/login` y sigue la configuración inicial.
 
 ### Persistencia de la base de datos
 
@@ -285,11 +287,16 @@ docker compose up -d
 | `JWT_SECRET`             | —               | Clave para firmar los tokens de sesión (sin valor por defecto)   |
 | `APP_TIMEZONE`           | `America/Bogota`| Zona horaria de la barbería: define "hoy" y qué horarios ya pasaron |
 | `DATABASE_URL`           | —               | Solo en la nube: reemplaza las variables `DB_*`                   |
-| `DB_SSL`                 | `true`          | Activa SSL (URL externa de Render o Neon)                         |
+| `DB_SSL`                 | `true`          | Activa SSL (URL externa de Render)                                |
 | `CORS_ORIGIN`            | `https://barberreserve-diego.onrender.com` | Dominios del frontend autorizados (sin la variable se acepta cualquiera) |
 | `TRUST_PROXY`            | `true`          | Detrás de un proxy: el límite de solicitudes usa la IP real       |
 
-El despliegue gratuito en Render está explicado paso a paso en [`DESPLIEGUE-RENDER.md`](DESPLIEGUE-RENDER.md).
+Despliegue gratuito en Render: [`DESPLIEGUE-RENDER.md`](DESPLIEGUE-RENDER.md).
+
+| Variable | Descripción |
+|---|---|
+| `CODIGO_INSTALACION` | Código que pide la configuración inicial. Obligatorio en producción |
+| `NODE_ENV` | `production` en el servidor: exige `JWT_SECRET` fuerte y `CODIGO_INSTALACION` |
 
 **`.env`** en la raíz (solo para Docker Compose — copia el `.env.example` de la raíz)
 
@@ -316,7 +323,7 @@ Debes ver **118 pruebas pasando** (76 originales + 42 de la versión 2.0: portal
 
 ### Prueba manual guiada (flujo completo)
 
-1. **Crea el primer admin** (ver arriba) e inicia sesión en `http://localhost:5174`.
+1. **Haz la configuración inicial** (ver arriba) en `http://localhost:5174/login`.
 2. Ve a **Barberos → + Nuevo Barbero**. Al guardarlo, aparecerá un aviso con una **contraseña temporal** — cópiala, no se vuelve a mostrar.
 3. Crea un **Servicio** (con su duración en minutos) y, si quieres, un **Cliente**.
 4. Ve a **Horarios**: verás una fila por cada barbero activo. Presiona **Configurar** — el sistema calcula solo la semana actual (no puedes elegir otra) y podrás ajustar cada día antes de guardar.
@@ -328,11 +335,11 @@ Debes ver **118 pruebas pasando** (76 originales + 42 de la versión 2.0: portal
 
 ##  API — Endpoints principales
 
-Todas las rutas (salvo `/api/auth/register`, `/api/auth/login` y `/api/publico/*`) requieren `Authorization: Bearer <token>`.
+Todas las rutas (salvo `/api/auth/estado-instalacion`, `/api/auth/configuracion-inicial`, `/api/auth/register`, `/api/auth/login`, `/api/auth/recuperar-acceso`, `/api/salud` y `/api/publico/*`) requieren `Authorization: Bearer <token>`.
 
 | Recurso          | Ruta base                                       | Acceso                                                                        |
 |------------------|-------------------------------------------------|-------------------------------------------------------------------------------|
-| Autenticación    | `/api/auth`         | `register` (solo primer admin), `login`, `me`, `cambiar-password` (cualquier usuario), `usuarios` (admin) |
+| Autenticación    | `/api/auth`         | `estado-instalacion`, `configuracion-inicial` (crea al dueño), `login`, `recuperar-acceso`, `me`, `cambiar-password`, `usuarios` (admin), `codigo-recuperacion` y `transferir-propiedad` (dueño) |
 | Clientes         | `/api/clientes`                                 | Exclusivo admin (lectura y escritura)                                         |
 | Barberos         | `/api/barberos`                                 | Exclusivo admin                                                               |
 | Servicios        | `/api/servicios`                                | Exclusivo admin                                                               |

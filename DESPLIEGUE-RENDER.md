@@ -1,5 +1,6 @@
 # Desplegar Barber Reserve en Render (plan gratuito)
 
+
 El repositorio trae un archivo `render.yaml` (Blueprint) que crea los tres servicios de una sola vez:
 
 | Servicio | Tipo en Render | Qué es | URL esperada |
@@ -13,7 +14,7 @@ No necesitas tarjeta de crédito para usar el plan gratuito.
 ## Antes de empezar: límites del plan gratuito
 
 - **El backend se apaga tras 15 minutos sin visitas.** La primera visita después tarda entre 30 y 60 segundos. La aplicación muestra el aviso *"Estamos activando el servidor…"* para que nadie crea que se dañó.
-- **La base de datos gratuita de Render vence 30 días después de crearla.** Si la entrega del examen es dentro de esos 30 días, no hay problema. Si necesitas que dure más, mira la sección "Base de datos que no vence (Neon)" al final.
+- **La base de datos gratuita de Render vence 30 días después de crearla.** Si la entrega del examen es dentro de esos 30 días, no hay problema. Si vence, hay que crear una base nueva y volver a hacer la configuración inicial.
 - El sitio estático (frontend) no se apaga ni vence.
 
 ## Paso 1. Subir el código a GitHub
@@ -41,23 +42,13 @@ Abre el servicio `barberreserve-diego-api` y mira la URL que aparece arriba.
 
 Prueba la API abriendo en el navegador: `https://barberreserve-diego-api.onrender.com/api/salud`. Debe responder `{"success":true,"estado":"ok"}`.
 
-## Paso 4. Crear el primer administrador (con Postman, como antes)
+## Paso 4. Configuración inicial (sin Postman)
 
-- Método: `POST`
-- URL: `https://barberreserve-diego-api.onrender.com/api/auth/register`
-- Body → raw → JSON:
+1. En Render abre `barberreserve-diego-api` → **Environment** y copia el valor de `CODIGO_INSTALACION`. Render lo generó al azar.
+2. Abre `https://barberreserve-diego.onrender.com/login`. Como todavía no hay dueño, el sistema te lleva a **Configuración inicial**.
+3. El dueño escribe sus datos y el código de instalación. El sistema le muestra su **código de recuperación**, que debe guardar.
 
-```json
-{
-  "nombre": "Diego Soto",
-  "email": "admin@barber.com",
-  "password": "UnaClaveSegura123*"
-}
-```
-
-Si responde *"Administrador registrado correctamente."*, entra a `https://barberreserve-diego.onrender.com/login` con ese correo y clave. Esa ruta solo funciona una vez: después de crear el primer administrador, los demás usuarios se crean desde el panel.
-
-> Si la primera petición tarda o da error de tiempo, es el arranque en frío: espera un minuto y repítela.
+> Si la primera petición tarda, es el arranque en frío: la app muestra "Estamos activando el servidor…". Espera un minuto.
 
 ## Paso 5. Cargar datos para la evaluación
 
@@ -74,6 +65,8 @@ Desde el panel, como administrador:
 |---|---|---|
 | API | `DATABASE_URL` | La toma Render de la base de datos (URL interna, sin SSL) |
 | API | `JWT_SECRET` | Render la genera al azar |
+| API | `CODIGO_INSTALACION` | Render la genera al azar; la pide la configuración inicial |
+| API | `NODE_ENV` | `production` |
 | API | `APP_TIMEZONE` | `America/Bogota` |
 | API | `TRUST_PROXY` | `true` (el límite de solicitudes usa la IP real del cliente) |
 | API | `CORS_ORIGIN` | URL del frontend: solo ese dominio puede llamar a la API |
@@ -86,20 +79,11 @@ Desde el panel, como administrador:
 
 Si no quieres que el evaluador espere el arranque en frío, abre la página 2 o 3 minutos antes. También puedes usar un monitor gratuito (por ejemplo UptimeRobot) que visite `/api/salud` cada 14 minutos; un solo servicio encendido todo el mes cabe dentro de las 750 horas gratuitas mensuales.
 
-## Base de datos que no vence (Neon)
-
-Si necesitas que los datos duren más de 30 días:
-
-1. Crea una cuenta gratuita en <https://neon.tech> y un proyecto en la región de EE. UU. Este.
-2. Copia su *connection string* (termina en `?sslmode=require`).
-3. En Render → `barberreserve-diego-api` → **Environment** → reemplaza `DATABASE_URL` por esa cadena y guarda. El backend detecta `sslmode=require` y activa SSL solo.
-4. Al arrancar, el backend crea las tablas y las restricciones. Vuelve a crear el primer administrador (paso 4).
-
 ## Problemas comunes
 
 | Síntoma | Causa probable | Solución |
 |---|---|---|
 | El portal carga pero no muestra servicios y la consola dice *CORS* | `CORS_ORIGIN` no coincide con la URL del frontend | Corregir `CORS_ORIGIN` (sin `/` final) y redesplegar la API |
 | Error 404 al recargar `/reservar` o `/login` | Falta la regla de reescritura del sitio estático | Ya viene en `render.yaml`; si creaste el sitio a mano, agrega *Redirects/Rewrites*: `/*` → `/index.html` (Rewrite) |
-| El despliegue de la API falla con *Error al conectar con PostgreSQL* | La base de datos aún no estaba lista o venció | Esperar a que la base esté *Available* y redesplegar; si venció, crear otra o usar Neon |
+| El despliegue de la API falla con *Error al conectar con PostgreSQL* | La base de datos aún no estaba lista o venció | Esperar a que la base esté *Available* y redesplegar; si venció, crear otra |
 | La primera carga tarda casi un minuto | Arranque en frío del plan gratuito | Normal; ver "Mantenerlo despierto" |

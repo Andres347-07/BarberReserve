@@ -4,11 +4,14 @@
  * VITE_API_URL puede venir como URL completa ("https://api.ejemplo.com/api")
  * o solo como dominio ("barberreserve-api.onrender.com"), que es lo que Render
  * entrega cuando el valor se toma de otro servicio. En ese caso se completa
- * con https:// y /api.
+ * con https:// y /api. También acepta una ruta relativa ("/api") cuando
+ * frontend y API están en el mismo dominio.
  */
 export function urlApi(valor = import.meta.env.VITE_API_URL) {
     if (!valor) return "http://localhost:4000/api";
     let url = valor.trim().replace(/\/+$/, "");
+    // Mismo dominio (por ejemplo "/api" detrás de un proxy): se usa tal cual
+    if (url.startsWith("/")) return url;
     if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
     if (!/\/api$/i.test(url)) url = `${url}/api`;
     return url;

@@ -53,6 +53,30 @@ const Usuario = sequelize.define(
             type: DataTypes.BOOLEAN,
             defaultValue: false,
         },
+
+        // Dueño del negocio: es el administrador principal. Solo hay uno.
+        // Puede crear y gestionar otros administradores y traspasar la
+        // propiedad. Nadie más puede desactivarlo ni cambiar su contraseña.
+        esPropietario: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false,
+        },
+
+        // Se incrementa al cambiar o restablecer la contraseña y al
+        // desactivar la cuenta: invalida las sesiones abiertas.
+        versionSesion: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0,
+        },
+
+        // Hash (bcrypt) del código de recuperación del dueño. Permite
+        // recuperar el acceso sin correo electrónico ni soporte técnico.
+        recuperacionHash: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
     },
     {
         tableName: "usuarios",

@@ -52,6 +52,28 @@ async function aplicarMigraciones(sequelize, { silencioso = false } = {}) {
     // 1d. Minutos de limpieza reservados después de cada cita.
     await ejecutar(sequelize, `ALTER TABLE "reservas" ADD COLUMN IF NOT EXISTS "limpieza" INTEGER NOT NULL DEFAULT 0;`, "Columna limpieza", avisos);
 
+    // 1e. Dueño del negocio, versión de sesión y código de recuperación.
+    await ejecutar(sequelize, `ALTER TABLE "usuarios" ADD COLUMN IF NOT EXISTS "esPropietario" BOOLEAN NOT NULL DEFAULT false;`, "Columna esPropietario", avisos);
+    await ejecutar(sequelize, `ALTER TABLE "usuarios" ADD COLUMN IF NOT EXISTS "versionSesion" INTEGER NOT NULL DEFAULT 0;`, "Columna versionSesion", avisos);
+    await ejecutar(sequelize, `ALTER TABLE "usuarios" ADD COLUMN IF NOT EXISTS "recuperacionHash" VARCHAR(255);`, "Columna recuperacionHash", avisos);
+    // Bases existentes: el administrador activo más antiguo pasa a ser el dueño.
+    await ejecutar(
+        sequelize,
+        `UPDATE "usuarios" SET "esPropietario" = true
+          WHERE id = (SELECT id FROM "usuarios" WHERE rol = 'admin' AND activo = true ORDER BY id LIMIT 1)
+            AND NOT EXISTS (SELECT 1 FROM "usuarios" WHERE "esPropietario" = true);`,
+        "Asignar dueño",
+        avisos
+    );
+    await ejecutar(
+        sequelize,
+        `CREATE UNIQUE INDEX IF NOT EXISTS "usuarios_un_solo_propietario" ON "usuarios" ("esPropietario") WHERE "esPropietario" = true;`,
+        "Índice de un solo dueño",
+        avisos
+    );
+    // Correos sin distinguir mayúsculas
+    await ejecutar(sequelize, `UPDATE "usuarios" SET email = lower(trim(email)) WHERE email <> lower(trim(email)) AND NOT EXISTS (SELECT 1 FROM "usuarios" u2 WHERE u2.email = lower(trim("usuarios".email)) AND u2.id <> "usuarios".id);`, "Correos en minúscula", avisos);
+
     // 2. Columnas nuevas de reservas.
     await ejecutar(
         sequelize,

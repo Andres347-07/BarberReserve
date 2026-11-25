@@ -10,3 +10,17 @@
 .config-control input{ max-width:140px; }
 .config-control select{ min-width:220px; }
 .config-unidad{ color:var(--text-muted); font-weight:500; }
+
+.config-seguridad {
+    margin-top: 24px;
+}
+
+.config-seguridad h2 {
+    font-size: 1.15rem;
+    margin: 0 0 6px;
+}
+
+.config-seguridad-form {
+    max-width: 420px;
+    margin-top: 12px;
+}

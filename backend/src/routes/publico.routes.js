@@ -8,12 +8,14 @@ const limitarSolicitudes = require("../middlewares/rateLimit.middleware");
 // La consulta usa POST para que el correo no quede en la URL ni en los logs.
 
 const limiteReservas = limitarSolicitudes({
+    nombre: "reservas",
     ventanaMs: 15 * 60 * 1000,
     maximo: 10,
     mensaje: "Ha realizado demasiados intentos de reserva. Intente de nuevo en unos minutos.",
 });
 
 const limiteConsultas = limitarSolicitudes({
+    nombre: "consultas",
     ventanaMs: 15 * 60 * 1000,
     maximo: 30,
     mensaje: "Ha realizado demasiadas consultas. Intente de nuevo en unos minutos.",

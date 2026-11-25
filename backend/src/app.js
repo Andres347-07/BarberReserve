@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
 
 require("./models");
 
@@ -19,6 +20,18 @@ const { noEncontrado, manejadorErrores } = require("./middlewares/error.middlewa
 
 const app = express();
 
+// No anunciar la tecnología del servidor
+app.disable("x-powered-by");
+
+// Cabeceras de seguridad. La API solo devuelve JSON, así que su política de
+// contenido es la más estricta posible.
+app.use(
+    helmet({
+        contentSecurityPolicy: { directives: { defaultSrc: ["'none'"], frameAncestors: ["'none'"] } },
+        crossOriginResourcePolicy: { policy: "cross-origin" },
+    })
+);
+
 // Detrás del proxy de Render (u otro hosting) req.ip debe ser la IP real del
 // cliente; de lo contrario el limitador de solicitudes contaría a todos juntos.
 if (process.env.TRUST_PROXY) {
@@ -36,7 +49,7 @@ const origenes = (process.env.CORS_ORIGIN || "")
     .map((o) => (/^https?:\/\//i.test(o) ? o : `https://${o}`));
 app.use(cors(origenes.length ? { origin: origenes } : undefined));
 app.use(express.json({ limit: "100kb" }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false, limit: "100kb" }));
 
 // Ruta de prueba
 app.get("/", (req, res) => {

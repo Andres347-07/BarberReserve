@@ -5,9 +5,9 @@ require("dotenv").config();
  * Conexión a PostgreSQL.
  *
  * - En local se usan las variables DB_HOST, DB_PORT, DB_NAME, DB_USER y DB_PASSWORD.
- * - En la nube (Render, Neon, etc.) basta con DATABASE_URL.
+ * - En la nube (Render) basta con DATABASE_URL.
  * - DB_SSL=true activa SSL. También se activa solo si la URL trae sslmode=require.
- *   La URL interna de Render no necesita SSL; la externa y la de Neon sí.
+ *   La URL interna de Render no necesita SSL; la externa sí.
  */
 const url = process.env.DATABASE_URL;
 const usarSSL =
@@ -15,6 +15,7 @@ const usarSSL =
 
 const opciones = {
     dialect: "postgres",
+    dialectModule: require("pg"),
     logging: false,
     ...(usarSSL && {
         dialectOptions: { ssl: { require: true, rejectUnauthorized: false } },

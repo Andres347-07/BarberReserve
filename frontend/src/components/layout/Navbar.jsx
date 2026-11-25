@@ -60,7 +60,7 @@ export default function Navbar({ menuAbierto = false, onAlternarMenu }) {
             <p className="navbar-nombre">{usuario?.nombre}</p>
             <p className="navbar-rol">
               <span className="sr-only">Rol: </span>
-              {usuario?.rol === "admin" ? "Administrador" : "Barbero"}
+              {usuario?.esPropietario ? "Dueño" : usuario?.rol === "admin" ? "Administrador" : "Barbero"}
             </p>
           </div>
         </div>

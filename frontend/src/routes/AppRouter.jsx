@@ -6,6 +6,8 @@ import PrivateRoute from "./PrivateRoute";
 import { useAuth } from "../contexts/useAuth";
 
 import Login from "../pages/Login";
+import ConfiguracionInicial from "../pages/Acceso/ConfiguracionInicial";
+import RecuperarAcceso from "../pages/Acceso/RecuperarAcceso";
 import Dashboard from "../pages/Dashboard";
 import Clientes from "../pages/Clientes";
 import Barberos from "../pages/Barberos";
@@ -66,6 +68,8 @@ export default function AppRouter() {
         <Route path="/panel" element={<InicioSegunRol />} />
 
         <Route path="/login" element={<Login />} />
+        <Route path="/configuracion-inicial" element={<ConfiguracionInicial />} />
+        <Route path="/recuperar-acceso" element={<RecuperarAcceso />} />
 
         <Route
           element={
